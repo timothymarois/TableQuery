@@ -121,5 +121,26 @@ TableQuery API
   qtable.draw();
 
 ```
+
+
+PHP Example (the POST variables) 
+---
+```PHP
+
+  // sorting variables
+  $sort         = (isset($_POST['sort'])) ? $_POST['sort'] : array();
+  // column to sort
+  $sortcol      = (isset($sort['col']) && $sort['col']!='') ? $sort['col'] : '';
+  // direction to sort (ASC or DESC)
+  $sortby       = (isset($sort['dir']) && $sort['dir']!='') ? $sort['dir'] : 'asc';
+  
+  // filter array
+  $filter       = (isset($_POST['filter'])) ? $_POST['filter'] : array();
+  // how many results to display
+  $limit        = (isset($filter['limit']) && $filter['limit']!='') ? $filter['limit'] : 10;
+  // custom search... and any other custom filters I want to send
+  $search       = (isset($filter['search']) && $filter['search']!='') ? strtolower($filter['search']) : '';
+
+```
   
   
