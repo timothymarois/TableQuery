@@ -108,7 +108,11 @@ THE SOFTWARE.
 
     settings = {
       filter : {
-        search : ''
+        search : '',
+        sort : {
+          col:'',
+          dir:'asc'
+        }
       },
       addons : {
         fixedHeader : false
@@ -124,10 +128,13 @@ THE SOFTWARE.
     var settings = $.extend({},settings,options);
 
     this.Initialize = function() {
+      // add class to table
       $(this.selector).addClass('tableQuery');
-      settings.params  = this.ajaxParam();
+      // create the headers
       this.thead(table);
+      // we have loaded the header already
       settings.already = 'true';
+      // send the ajax request
       this.request();
     };
 
@@ -153,11 +160,17 @@ THE SOFTWARE.
     };
 
 
+
+    this.filter = function(filters) {
+      $.extend( settings.filter, filters );
+    };
+
+
     this.ajaxParam = function() {
       var params    = {}
       params.filter = settings.filter;
-      // params.limit  = settings.limit;
-      params.sort   = {dir:'asc'};
+      params.sort   = settings.params.sort.col;
+      params.sort   = settings.params.sort.dir;
       return params
     };
 
@@ -165,7 +178,7 @@ THE SOFTWARE.
     this.ajaxRequest = function (aparam) {
       $.ajax({
         "url" : settings.url,
-        "data": settings.params,
+        "data": settings.filter,
         "success": function (d) {
           settings.json = d;
           settings.success(d);
@@ -211,6 +224,7 @@ THE SOFTWARE.
           // add the tbindex
           $(c).attr('tbindex',tbindex);
 
+          // hide the column header
           if (cvisible==='false') {
             $(c).hide();
           }
@@ -229,15 +243,11 @@ THE SOFTWARE.
                   self.colsort(c,'desc');
                 }
 
-                settings.params.sort.col = cname;
-                settings.params.sort.dir = csort;
+                settings.filter.sort = {col:cname,dir:csort};
               }
               else {
                 self.colsort(c,'asc');
               }
-            }
-            else {
-              
             }
           }
       
@@ -290,8 +300,10 @@ THE SOFTWARE.
         }
 
         // add new sort options
-        settings.params.sort.col = $(this).attr('colname');
-        settings.params.sort.dir = sortby;
+   
+
+        settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
+
         self.request();
 
       });
