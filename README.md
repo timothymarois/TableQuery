@@ -1,4 +1,4 @@
-TableQuery v1.0.0
+TableQuery v1.0.1
 ==========
 
 a jQuery plugin that communicates with the server and displays sortable table data.

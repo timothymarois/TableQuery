@@ -37,7 +37,7 @@ THE SOFTWARE.
   function createColumnContent(o,d,c) {
     var td = document.createElement('td');
     if (c!='') td.className = c;
-    td.appendChild(document.createTextNode(d));
+    td.innerHTML = d;
     o.appendChild(td);
   };
 
