@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.1
+@version: 1.0.2
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -116,6 +116,7 @@ THE SOFTWARE.
       complete : {
         fixedHeader : false
       },
+      beforeSend : function () { },
       success : function () { },
       error : function () { }
     }
@@ -168,6 +169,9 @@ THE SOFTWARE.
         "success": function (d) {
           settings.json = d;
           settings.success(d);
+        },
+        "beforeSend": function () {
+          settings.beforeSend();
         },
         "dataType": "json",
         "cache": false,
