@@ -1,4 +1,4 @@
-TableQuery
+TableQuery v1.0.0
 ==========
 
 a jQuery plugin that communicates with the server and displays sortable table data.
@@ -19,9 +19,9 @@ followed by each Column name. (must match the column attributes, the order doesn
 ```json
 
 {
-  "itemsTotal":1,
-  "itemsFiltered":1,
-  "itemsDisplayed":1,
+  "itemsTotal":2,
+  "itemsFiltered":2,
+  "itemsDisplayed":2,
   "rows":[
     {"first_name":"John","last_name":"Smith","birth":"05-22-88"},
     {"first_name":"Mike","last_name":"Bay","birth":"03-10-78"}, 
