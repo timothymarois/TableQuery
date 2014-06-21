@@ -36,26 +36,26 @@ HTML Table
 
 ```html
 
-<!--COLUMN HEADER ATTRIBUTES
+<!-- COLUMN HEADER ATTRIBUTES
+     ============================
 
    "colname"    = name of the column (must match json array)
    "colclass"   = add a class to the "whole" column
    "colsort"    = sort this column by (ASC) or (DESC) [sets the default sortby] or (false) disable sorting
    "coldefault" = (true) sort this column by default on load
    "colvisible" = (false) to hide column on load
+-->
 
-  -->
-
-<table id="example" cellspacing="0" style="margin-top:30px">
-        <thead>
-          <tr>
-            <th colname="first_name" colsort="asc">First Name</th>
-            <th colname="last_name" colsort="asc" coldefault="true">last Name</th>
-            <th colname="birth" colclass="aright" colvisible="false">Date of Birth</th>
-            </tr>
-          </thead>
-        </table>
-      </div>
+<table id="example">
+ <thead>
+  <tr>
+   <th colname="first_name" colsort="asc">First Name</th>
+   <th colname="last_name" colsort="asc" coldefault="true">last Name</th>
+   <th colname="birth" colclass="aright" colvisible="false">Date of Birth</th>
+  </tr>
+ </thead>
+</table>
+      
 ```
 
 Javascript
@@ -64,22 +64,31 @@ Javascript
 ```javascript
 
 var qtable = $('#example').tableQuery({
-    url:'/myfile.php',
-    type:'POST',
-    filter:{
-      limit:50,
-      search:''
-    },
-    addons : {
-      fixedHeader: true
-    },
-    success : function (d) {
-      
-    },
-    error : function (xhr,error,thrown) {
-      
-    }
-  });
+  // file to request JSON data
+  url:'/myfile.php',
+  // POST (form) or GET (url param) request
+  type:'POST',
+  // everything sent in the filter, is sent to server as POST or GET filter[] array
+  // such as filter['limit'] (how many results to return) 
+  filter:{
+    limit:50,
+    search:''
+  },
+  addons : {
+    // fixed header keeps the table <THEAD> always fixed and never scrolls off screen
+    fixedHeader: true
+  },
+  beforeSend: function() {
+    // if you want to do anything before the server is complete
+    // such as start a loading bar?
+  },
+  success : function (d) {
+    // any extra javascript you want to fire after table is loaded
+  },
+  error : function (xhr,error,thrown) {
+    // if server request fails, error is thrown here
+  }
+});
 
   ```
   
