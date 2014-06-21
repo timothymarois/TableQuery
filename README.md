@@ -81,3 +81,29 @@ var qtable = $('#example').tableQuery({
   });
 
   ```
+  
+  
+TableQuery API
+---
+```javascript
+  
+  // send filter changes using this function
+  // it does not reload the table, so after you change all filters,
+  // request a reload
+  qtable.filter({test:123});
+  
+  // reloads the table (sends ajax request and updates the data)
+  qtable.reload();
+  
+  // Show / Hide Columns
+  // you can add as many columns as you wish within the array,
+  // the names must match the column names .show() and .hide() 
+  
+  // displays the column instantly
+  qtable.show(['birth']);
+  // hides the column instantly
+  qtable.hide(['last_name']);
+
+```
+  
+  
