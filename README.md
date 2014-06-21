@@ -2,7 +2,6 @@ TableQuery
 ==========
 
 a jQuery plugin that communicates with the server and displays sortable table data.
--
 
 
 Current Example of API features. I will complete this readme once I have some extra time. 
@@ -12,7 +11,7 @@ It is built for speed, and simplistic coding for efficiency.
 
 
 JSON
----
+--
 
 "row" being the most important array for TableQuery to create the content of each row
 followed by each Column name. (must match the column attributes, the order doesn't matter, the names do)
@@ -22,17 +21,17 @@ followed by each Column name. (must match the column attributes, the order doesn
 {
   "itemsTotal":1,
   "itemsFiltered":1,
-   itemsDisplayed":1,
-   "rows":[
-     {"first_name":"John","last_name":"Smith","birth":"05-22-88"},
-     {"first_name":"Mike","last_name":"Bay","birth":"03-10-78"}, 
-     etc..
-    ]
+  "itemsDisplayed":1,
+  "rows":[
+    {"first_name":"John","last_name":"Smith","birth":"05-22-88"},
+    {"first_name":"Mike","last_name":"Bay","birth":"03-10-78"}, 
+  ]
 }
+
 ```
 
 HTML Table
----
+--
 
 ```html
 
@@ -59,7 +58,7 @@ HTML Table
 ```
 
 Javascript
----
+--
 
 ```javascript
 
