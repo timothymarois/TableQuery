@@ -2,10 +2,27 @@ TableQuery
 ==========
 
 a jQuery plugin that communicates with the server and displays sortable table data.
-
+-----
 
 
 Current Example of API features. I will complete this readme once I have some extra time. 
+This jQuery plug-in is built for AJAX (server-side) data loading. 
+TableQuery does not do the actual sorting of columns. The server sends the proper order that will be displayed. 
+It is built for speed, and simplistic coding for efficiency.
+
+
+```json
+// "row" being the most important array for TableQuery to create the content of each row
+// followed by each Column name. (must match the column attributes, the order doesn't matter, the names do)
+{
+  "itemsTotal":1,
+  "itemsFiltered":1,
+   itemsDisplayed":1,
+   "rows":[
+     {"first_name":"John","last_name":"Smith","birth":"05-22-88"},
+     {"first_name":"Mike","last_name":"Bay","birth":"03-10-78"}, 
+     etc..
+```
 
 
 ```html
@@ -17,7 +34,7 @@ Current Example of API features. I will complete this readme once I have some ex
    "colsort"    = sort this column by (ASC) or (DESC) [sets the default sortby] or (false) disable sorting
    "coldefault" = (true) sort this column by default on load
    "colvisible" = (false) to hide column on load
-   
+
   -->
 
 <table id="example" cellspacing="0" style="margin-top:30px">
@@ -25,7 +42,7 @@ Current Example of API features. I will complete this readme once I have some ex
           <tr>
             <th colname="first_name" colsort="asc">First Name</th>
             <th colname="last_name" colsort="asc" coldefault="true">last Name</th>
-            <th colname="last_name" colclass="aright" colvisible="false">Date of Birth</th>
+            <th colname="birth" colclass="aright" colvisible="false">Date of Birth</th>
             </tr>
           </thead>
         </table>
