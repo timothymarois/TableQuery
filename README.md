@@ -12,6 +12,7 @@ It is built for speed, and simplistic coding for efficiency.
 
 JSON
 --
+TableQuery needs the server to respond with JSON request, format as follows.
 
 "row" being the most important array for TableQuery to create the content of each row
 followed by each Column name. (must match the column attributes, the order doesn't matter, the names do)
@@ -86,14 +87,14 @@ var qtable = $('#example').tableQuery({
 TableQuery API
 ---
 ```javascript
+
+  // reloads the table (sends ajax request and updates the data)
+  qtable.reload();
   
   // send filter changes using this function
   // it does not reload the table, so after you change all filters,
   // request a reload
   qtable.filter({test:123});
-  
-  // reloads the table (sends ajax request and updates the data)
-  qtable.reload();
   
   // Show / Hide Columns
   // you can add as many columns as you wish within the array,
@@ -103,6 +104,12 @@ TableQuery API
   qtable.show(['birth']);
   // hides the column instantly
   qtable.hide(['last_name']);
+  
+  // if something isn't right, redraw the table. 
+  // if changes in the html have changed from your own application,
+  // you may need to tell tableQuery to draw up new columns
+  // this does not request server
+  qtable.draw();
 
 ```
   
