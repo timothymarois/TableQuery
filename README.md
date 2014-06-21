@@ -133,13 +133,11 @@ PHP Example (the POST variables)
   $sortcol      = (isset($sort['col']) && $sort['col']!='') ? $sort['col'] : '';
   // direction to sort (ASC or DESC)
   $sortby       = (isset($sort['dir']) && $sort['dir']!='') ? $sort['dir'] : 'asc';
-  
-  // filter array
-  $filter       = (isset($_POST['filter'])) ? $_POST['filter'] : array();
+
   // how many results to display
-  $limit        = (isset($filter['limit']) && $filter['limit']!='') ? $filter['limit'] : 10;
+  $limit        = (isset($_POST['limit']) && $_POST['limit']!='') ? $_POST['limit'] : 10;
   // custom search... and any other custom filters I want to send
-  $search       = (isset($filter['search']) && $filter['search']!='') ? strtolower($filter['search']) : '';
+  $search       = (isset($_POST['search']) && $_POST['search']!='') ? strtolower($_POST['search']) : '';
 
 ```
   
