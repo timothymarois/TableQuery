@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.3
+@version: 1.0.4
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -382,7 +382,7 @@ THE SOFTWARE.
       var otable = document.getElementById(selector+'_FixedHeader_Cloned_id');
 
       // Set the wrapper width to match that of the cloned table 
-      $(this.selector+'_FixedHeader_Cloned_id').width($(table).outerWidth());
+      $(this.selector+'_FixedHeader_Cloned_id').width($(table).width());
 
       // keep up with all the column widths (TH)
       $("thead>tr th", table).each( function (i) {
@@ -453,12 +453,12 @@ THE SOFTWARE.
 
       $(window).scroll( function () {
         adjustFixedHeader();
-        $(self.selector+'_FixedHeader_Cloned_id').width($(table).outerWidth());
+        $(self.selector+'_FixedHeader_Cloned_id').width($(table).width());
       });
 
       $(window).resize( function () {
         adjustFixedHeader();
-        $(self.selector+'_FixedHeader_Cloned_id').width($(table).outerWidth());
+        $(self.selector+'_FixedHeader_Cloned_id').width($(table).width());
       });
 
       $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
