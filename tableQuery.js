@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.4
+@version: 1.0.5
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -115,7 +115,8 @@ THE SOFTWARE.
         }
       },
       addons : {
-        fixedHeader : false
+        fixedHeader : false,
+        fixedFooter : false
       },
       complete : {
         fixedHeader : false
@@ -124,6 +125,36 @@ THE SOFTWARE.
       success : function () { },
       error : function () { }
     }
+
+    var Measure = {}
+    Measure.win = {
+      "scrollTop":0,
+      "ScrollRight":0,
+      "ScrollBottom":0,
+      "ScrollLeft":0,
+      "Height":0,
+      "Width":0
+    };
+
+    Measure.doc = {
+      "Height": 0,
+      "Width": 0
+    };
+
+    Measure.table = {
+      "Width": 0,
+      "Height": 0,
+      "Left": 0,
+      "Right": 0, 
+      "Top": 0,
+      "Bottom": 0,
+      "thead" : 0,
+      "cells" : 0
+    };
+
+    Measure.offset = {
+      "top": 0
+    };
 
     var settings = $.extend({},settings,options);
 
@@ -147,6 +178,7 @@ THE SOFTWARE.
       // if json exist, draw the table, or else wait..
       if (typeof settings.json !== 'undefined') {
         self.draw();
+        settings.success(settings.json);
       }
       else {
         // wait for request before continuing...
@@ -154,11 +186,11 @@ THE SOFTWARE.
           if (typeof settings.json !== 'undefined') {
             clearInterval(rInt);
             self.draw();
+            settings.success(settings.json);
           }
         }, 10);
       }
     };
-
 
 
     this.filter = function(filters) {
@@ -181,7 +213,6 @@ THE SOFTWARE.
         "data": settings.filter,
         "success": function (d) {
           settings.json = d;
-          settings.success(d);
         },
         "beforeSend": function () {
           settings.beforeSend();
@@ -303,7 +334,6 @@ THE SOFTWARE.
    
 
         settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
-
         self.request();
 
       });
@@ -333,6 +363,10 @@ THE SOFTWARE.
         // activate fixed header if option is true
         if (settings.addons.fixedHeader===true) {
           this.fixedHeader();
+        }
+
+        if (settings.addons.fixedFooter===true) {
+          this.fixedFooter();
         }
       }
       else{
@@ -373,12 +407,12 @@ THE SOFTWARE.
 
 
     this.fixedHeader = function() {
+
       // only allow one header to be created
       if (settings.complete.fixedHeader!==true) {
         self.createFixedHeader();
       }
 
-      var nTable = table;
       var otable = document.getElementById(selector+'_FixedHeader_Cloned_id');
 
       // Set the wrapper width to match that of the cloned table 
@@ -389,64 +423,33 @@ THE SOFTWARE.
         $("thead>tr th:eq("+i+")", otable).width( $(this).width() );
       });
 
-      var oWin = {"iScrollTop": 0,"iScrollRight": 0,"iScrollBottom": 0,"iScrollLeft": 0,"iHeight": 0,"iWidth": 0};
-      var oDoc = {"iHeight": 0,"iWidth": 0};
-      var oMes = {"iTableWidth": 0,"iTableHeight": 0,"iTableLeft": 0,"iTableRight": 0, "iTableTop": 0,"iTableBottom": 0 };
-
-      function _fnSumScroll ( n, side ) {
-        var i = n[side];
-        while ( n = n.parentNode ) {
-          if ( n.nodeName == 'HTML' || n.nodeName == 'BODY' ) {
-            break;
-          }
-
-          i = n[side];
-        }
-
-        return i;
-      }
 
       function adjustFixedHeader()
       {
-        var jqWin=$(window),jqDoc=$(document)
-        oDoc.iHeight = jqDoc.height();
-        oDoc.iWidth = jqDoc.width();
-        oWin.iHeight = jqWin.height();
-        oWin.iWidth = jqWin.width();
-        oWin.iScrollTop = jqWin.scrollTop();
-        oWin.iScrollLeft = jqWin.scrollLeft();
+        self.measureUp();
 
-        var m = oMes,
-        jqTable = $(table),
-        oOffset = jqTable.offset(),
-        iParentScrollTop = _fnSumScroll( table.parentNode, 'scrollTop' ),
-        iParentScrollLeft = _fnSumScroll( table.parentNode, 'scrollLeft' );
-
-        m.iTableLeft = oOffset.left + table.parentNode.scrollLeft;
-        m.iTableTop = oOffset.top + iParentScrollTop;
-
-        var nTable=selector+'_wrapper',iTbodyHeight=0,anTbodies=table.getElementsByTagName('tbody');
+        var iTbodyHeight=0,anTbodies=table.getElementsByTagName('tbody');
         for (var i = 0; i < anTbodies.length; ++i) {
           iTbodyHeight += anTbodies[i].offsetHeight;
         }
 
-        if ( oMes.iTableTop > oWin.iScrollTop ) {
+        if ( Measure.table.Top > Measure.win.ScrollTop ) {
           // Above the table 
           $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
           $('#'+selector+'_FixedHeader_Cloned').css({'top':$(table).offset().top+"px"});
-          $('#'+selector+'_FixedHeader_Cloned').css({'left':(oMes.iTableLeft-oWin.iScrollLeft)+"px"});         
+          $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
         }
-        else if ( oWin.iScrollTop > oMes.iTableTop+iTbodyHeight ) {
+        else if ( Measure.win.ScrollTop > Measure.table.Top+iTbodyHeight ) {
           // below the table 
           $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
-          $('#'+selector+'_FixedHeader_Cloned').css({'top':(oMes.iTableTop+iTbodyHeight)+"px"});
-          $('#'+selector+'_FixedHeader_Cloned').css({'left':(oMes.iTableLeft-oWin.iScrollLeft)+"px"});     
+          $('#'+selector+'_FixedHeader_Cloned').css({'top':(Measure.table.Top+iTbodyHeight)+"px"});
+          $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
         }
         else {
           // In the middle of the table 
           $('#'+selector+'_FixedHeader_Cloned').css({'position':'fixed'});
           $('#'+selector+'_FixedHeader_Cloned').css({'top':"0px"});
-          $('#'+selector+'_FixedHeader_Cloned').css({'left':(oMes.iTableLeft-oWin.iScrollLeft)+"px"});
+          $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
         }
       };
 
@@ -463,12 +466,135 @@ THE SOFTWARE.
 
       $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
       $('#'+selector+'_FixedHeader_Cloned').css({'top':$(table).offset().top+"px"});
-      $('#'+selector+'_FixedHeader_Cloned').css({'left':(oMes.iTableLeft-oWin.iScrollLeft)+"px"});
+      $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
 
       adjustFixedHeader();
-
     };
 
+
+    this.createFixedFooter = function() {
+      tableClone = table.cloneNode( false );
+      tableClone.removeAttribute( 'id' );
+
+      var hDiv = document.createElement( 'div' );
+      hDiv.style.position = "absolute";
+      // hDiv.style.top = "0px";
+      hDiv.style.left = "0px";
+      hDiv.style.bottom = "0px";
+      hDiv.className = "FixedFooter_Cloned";
+      hDiv.id = selector+"_FixedFooter_Cloned";
+      hDiv.style.zIndex = 9999;
+      // remove margins since we are going to poistion it absolute 
+      tableClone.style.margin = "0";
+
+      // Insert the newly cloned table into the DOM, on top of the "real" header 
+      hDiv.appendChild( tableClone );
+      document.body.appendChild( hDiv );
+
+      $(this.selector+"_FixedFooter_Cloned table").attr('id',selector+'_FixedFooter_Cloned_id');
+
+      var otable = document.getElementById(selector+'_FixedFooter_Cloned_id');
+
+      var nTfoot = $('tfoot', table).clone(true)[0];
+      otable.appendChild( nTfoot );
+
+      settings.complete.fixedFooter = true;
+    }
+
+   
+    this.fixedFooter = function() {
+      // only allow one header to be created
+      if (settings.complete.fixedFooter!==true) {
+        self.createFixedFooter();
+      }
+
+      // fixedFooter Div Table
+      var ftable = document.getElementById(selector+'_FixedFooter_Cloned');
+
+      // Set the wrapper width to match that of the cloned table 
+      $(this.selector+'_FixedFooter_Cloned_id').width($(table).width());
+
+      // keep up with all the column widths (TH)
+      $("tfoot>tr th", table).each( function (i) {
+        $("tfoot>tr th:eq("+i+")", ftable).width( $(this).width() );
+      });
+
+      function adjustFixedFooter()
+      {
+        self.measureUp();
+
+        if ( Measure.win.ScrollBottom > Measure.table.Bottom ) {
+          $('#'+selector+'_FixedFooter_Cloned').css({'position':'absolute'});
+          $('#'+selector+'_FixedFooter_Cloned').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
+          $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"});
+        }
+        else if ( Measure.win.ScrollBottom < (Measure.table.Bottom+Measure.table.Height-Measure.table.cells) ){
+          // Middle
+          $('#'+selector+'_FixedFooter_Cloned').css({'position':'fixed'});
+          // $('#'+selector+'_FixedFooter_Cloned').css({'top':(Measure.win.Height-Measure.table.cells)+"px"});
+          $('#'+selector+'_FixedFooter_Cloned').css({'top':"auto"});
+          $('#'+selector+'_FixedFooter_Cloned').css({'bottom':"0px"});
+          $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"});        
+        }
+        else {
+          // Above
+          $('#'+selector+'_FixedFooter_Cloned').css({'position':'absolute'});
+          $('#'+selector+'_FixedFooter_Cloned').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
+          $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"});
+        }
+
+      };
+
+      $(window).scroll( function () {
+        adjustFixedFooter();
+      });
+
+      $(window).resize( function () {
+        adjustFixedFooter();
+      });
+
+      $('#'+selector+'_FixedFooter_Cloned').css({'position':'fixed'});
+      $('#'+selector+'_FixedFooter_Cloned').css({'top':"auto"});
+      $('#'+selector+'_FixedFooter_Cloned').css({'bottom':"0px"});
+      $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"}); 
+      adjustFixedFooter();
+    };
+
+
+    this.measureUp = function() {
+      var 
+      jwin=$(window),
+      jdoc=$(document),
+      win=Measure.win,
+      doc=Measure.doc,
+      jTable = $(table),
+      jOffset = jTable.offset(),
+      mTable=Measure.table;
+
+      // doc and window measurements
+      doc.Height = jdoc.height();
+      doc.Width = jdoc.width();
+      win.Height = jwin.height();
+      win.Width = jwin.width();      
+      win.ScrollTop = jwin.scrollTop();      
+      win.ScrollLeft = jwin.scrollLeft();      
+      win.ScrollRight = doc.Width - win.ScrollLeft - win.Width;
+      win.ScrollBottom = doc.Height - win.ScrollTop - win.Height;
+
+      // table measurements
+      mTable.Width = jTable.outerWidth()
+      mTable.Height = jTable.outerHeight();
+      mTable.Left = jOffset.left + table.parentNode.scrollLeft;
+      mTable.Top = jOffset.top;
+      mTable.Right = mTable.Left + mTable.Width;
+      mTable.Right = doc.Width - mTable.Left - mTable.Width;
+      mTable.Bottom = doc.Height - mTable.Top - mTable.Height;
+
+      mTable.thead = $("thead", table).height(),
+      mTable.cells = $(table).height();
+
+    };
+    
 
 
     /**
@@ -546,6 +672,15 @@ THE SOFTWARE.
    
     // begin table Initialization
     this.Initialize();
+
+    // always measure up the document, window and table
+    $(window).scroll( function () {
+      self.measureUp();
+    });
+
+    $(window).resize( function () {
+      self.measureUp();
+    });
 
     // give outside access
     return this;
