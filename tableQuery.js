@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.7
+@version: 1.0.8
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -119,7 +119,8 @@ THE SOFTWARE.
         fixedFooter : false
       },
       complete : {
-        fixedHeader : false
+        fixedHeader : false,
+        fixedFooter : false
       },
       beforeSend : function () { },
       success : function () { },
@@ -149,6 +150,7 @@ THE SOFTWARE.
       "Top": 0,
       "Bottom": 0,
       "thead" : 0,
+      "tfoot" : 0,
       "cells" : 0
     };
 
@@ -186,6 +188,12 @@ THE SOFTWARE.
             $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
           });
         }
+
+        if (settings.addons.fixedFooter===true) {
+          /*$("thead>tr th", document.getElementById(selector)).each( function (i) {
+            $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedFooter_Cloned_id')).width( $(this).width() );
+          });*/
+        }
       }
       else {
         // wait for request before continuing...
@@ -200,6 +208,12 @@ THE SOFTWARE.
               $("thead>tr th", document.getElementById(selector)).each( function (i) {
                 $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
               });
+            }
+
+            if (settings.addons.fixedFooter===true) {
+              /*$("thead>tr th", document.getElementById(selector)).each( function (i) {
+                $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedFooter_Cloned_id')).width( $(this).width() );
+              });*/
             }
 
           }
@@ -382,7 +396,7 @@ THE SOFTWARE.
 
         if (settings.addons.fixedFooter===true) {
           // disable until bugs are resolved
-          // this.fixedFooter();
+          this.fixedFooter();
         }
       }
       else{
@@ -401,7 +415,7 @@ THE SOFTWARE.
       hDiv.style.left = "0px";
       hDiv.className = "FixedHeader_Cloned";
       hDiv.id = selector+"_FixedHeader_Cloned";
-      hDiv.style.zIndex = 9999;
+      hDiv.style.zIndex = 99;
       // remove margins since we are going to poistion it absolute 
       tableClone.style.margin = "0";
 
@@ -532,77 +546,58 @@ THE SOFTWARE.
 
       function adjustFixedFooter()
       {
-        self.measureUp();
 
-        if ( Measure.win.ScrollBottom > Measure.table.Bottom ) {
-          $('#'+selector+'_FixedFooter_Cloned').css({'position':'absolute'});
-          $('#'+selector+'_FixedFooter_Cloned').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
-          $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"});
-        }
-        else if ( Measure.win.ScrollBottom < (Measure.table.Bottom+Measure.table.Height-Measure.table.cells) ){
-          // Middle
-          $('#'+selector+'_FixedFooter_Cloned').css({'position':'fixed'});
-          // $('#'+selector+'_FixedFooter_Cloned').css({'top':(Measure.win.Height-Measure.table.cells)+"px"});
-          $('#'+selector+'_FixedFooter_Cloned').css({'top':"auto"});
-          $('#'+selector+'_FixedFooter_Cloned').css({'bottom':"0px"});
-          $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"});        
-        }
-        else {
-          // Above
-          $('#'+selector+'_FixedFooter_Cloned').css({'position':'absolute'});
-          $('#'+selector+'_FixedFooter_Cloned').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
-          $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"});
+        var iTbodyHeight=0,anTbodies=table.getElementsByTagName('tbody');
+        for (var i = 0; i < anTbodies.length; ++i) {
+          iTbodyHeight += anTbodies[i].offsetHeight;
         }
 
       };
 
       $(window).scroll( function () {
+        self.measureUp();
         adjustFixedFooter();
       });
 
       $(window).resize( function () {
+        self.measureUp();
         adjustFixedFooter();
       });
 
       $('#'+selector+'_FixedFooter_Cloned').css({'position':'fixed'});
       $('#'+selector+'_FixedFooter_Cloned').css({'top':"auto"});
-      $('#'+selector+'_FixedFooter_Cloned').css({'bottom':"0px"});
+      $('#'+selector+'_FixedFooter_Cloned').css({'bottom':"50px"});
       $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"}); 
+
+      self.measureUp();
       adjustFixedFooter();
     };
 
 
     this.measureUp = function() {
-      var 
-      jwin=$(window),
-      jdoc=$(document),
-      win=Measure.win,
-      doc=Measure.doc,
-      jTable = $(table),
-      jOffset = jTable.offset(),
-      mTable=Measure.table;
 
       // doc and window measurements
-      doc.Height = jdoc.height();
-      doc.Width = jdoc.width();
-      win.Height = jwin.height();
-      win.Width = jwin.width();      
-      win.ScrollTop = jwin.scrollTop();      
-      win.ScrollLeft = jwin.scrollLeft();      
-      win.ScrollRight = doc.Width - win.ScrollLeft - win.Width;
-      win.ScrollBottom = doc.Height - win.ScrollTop - win.Height;
+      Measure.doc.Height = $(document).height();
+      Measure.doc.Width = $(document).width();
+      Measure.win.Height = $(window).height();
+      Measure.win.Width = $(window).width();      
+      Measure.win.ScrollTop = $(window).scrollTop();      
+      Measure.win.ScrollLeft = $(window).scrollLeft();      
+      Measure.win.ScrollRight = Measure.doc.Width - Measure.win.ScrollLeft - Measure.win.Width;
+      Measure.win.ScrollBottom = Measure.doc.Height - Measure.win.ScrollTop - Measure.win.Height;
 
       // table measurements
-      mTable.Width = jTable.outerWidth()
-      mTable.Height = jTable.outerHeight();
-      mTable.Left = jOffset.left + table.parentNode.scrollLeft;
-      mTable.Top = jOffset.top;
-      mTable.Right = mTable.Left + mTable.Width;
-      mTable.Right = doc.Width - mTable.Left - mTable.Width;
-      mTable.Bottom = doc.Height - mTable.Top - mTable.Height;
+      Measure.table.Width = $(this.selector).outerWidth()
+      Measure.table.Height = $(this.selector).outerHeight();
+      Measure.table.Left = $(this.selector).offset().left + table.parentNode.scrollLeft;
+      Measure.table.Top = $(this.selector).offset().top;
+      Measure.table.Right = Measure.table.Left + Measure.table.Width;
+      Measure.table.Right = Measure.doc.Width - Measure.table.Left - Measure.table.Width;
+      Measure.table.Bottom = Measure.doc.Height - Measure.table.Top - Measure.table.Height;
 
-      mTable.thead = $("thead", table).height(),
-      mTable.cells = $(table).height();
+      Measure.table.thead = $("thead", table).height(),
+      Measure.table.tfoot = $("tfoot", table).height(),
+      Measure.table.cells = $(table).height();
 
     };
     
@@ -690,7 +685,7 @@ THE SOFTWARE.
     });
 
     $(window).resize( function () {
-      self.measureUp(); 
+      self.measureUp();
     });
 
     // give outside access
