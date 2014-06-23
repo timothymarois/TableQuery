@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.6
+@version: 1.0.7
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -106,7 +106,7 @@ THE SOFTWARE.
     var selector = this.selector.replace('#','');
     var table = document.getElementById(selector);
 
-    settings = {
+    var settings = {
       filter : {
         search : '',
         sort : {
@@ -179,6 +179,13 @@ THE SOFTWARE.
       if (typeof settings.json !== 'undefined') {
         self.draw();
         settings.success(settings.json);
+
+        // this is one last update, incase success modifies the column headers
+        if (settings.addons.fixedHeader===true) {
+          $("thead>tr th", document.getElementById(selector)).each( function (i) {
+            $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+          });
+        }
       }
       else {
         // wait for request before continuing...
@@ -187,6 +194,14 @@ THE SOFTWARE.
             clearInterval(rInt);
             self.draw();
             settings.success(settings.json);
+
+            // this is one last update, incase success modifies the column headers
+            if (settings.addons.fixedHeader===true) {
+              $("thead>tr th", document.getElementById(selector)).each( function (i) {
+                $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+              });
+            }
+
           }
         }, 10);
       }
@@ -366,12 +381,13 @@ THE SOFTWARE.
         }
 
         if (settings.addons.fixedFooter===true) {
-          this.fixedFooter();
+          // disable until bugs are resolved
+          // this.fixedFooter();
         }
       }
       else{
         $(this.selector).html('No records found!');
-      }
+      }      
     };
 
 
@@ -396,11 +412,9 @@ THE SOFTWARE.
       $(this.selector+"_FixedHeader_Cloned table").attr('id',selector+'_FixedHeader_Cloned_id');
       $(this.selector+"_FixedHeader_Cloned").append("<div class='stole_shadow'></div>");
 
-      var otable = document.getElementById(selector+'_FixedHeader_Cloned_id');
-
       /* Clone the DataTables header */
       var nThead = $('thead',table).clone(true)[0];
-      otable.appendChild( nThead );
+      document.getElementById(selector+'_FixedHeader_Cloned_id').appendChild( nThead );
 
       settings.complete.fixedHeader = true;
     }
@@ -413,16 +427,13 @@ THE SOFTWARE.
         self.createFixedHeader();
       }
 
-      var otable = document.getElementById(selector+'_FixedHeader_Cloned_id');
-
       // Set the wrapper width to match that of the cloned table 
       $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
       // keep up with all the column widths (TH)
-      $("thead>tr th", table).each( function (i) {
-       // $("thead>tr th:eq("+i+")", otable).width( $(this).width() );
+      $("thead>tr th", document.getElementById(selector)).each( function (i) {
+        $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
       });
-
 
       function adjustFixedHeader()
       {
@@ -457,7 +468,6 @@ THE SOFTWARE.
       $(window).scroll( function () {
         adjustFixedHeader();
         $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
-        console.log($('#'+selector).outerWidth());
       });
 
       $(window).resize( function () {
@@ -680,7 +690,7 @@ THE SOFTWARE.
     });
 
     $(window).resize( function () {
-      self.measureUp();
+      self.measureUp(); 
     });
 
     // give outside access
