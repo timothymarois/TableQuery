@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.10
+@version: 1.0.11
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,9 +34,11 @@ THE SOFTWARE.
    * @param d : data of td column 
    * @param c : Class to add to each td column
    */
-  function createColumnContent(o,d,c) {
+  function createColumnContent(o,d,c,n,h) {
     var td = document.createElement('td');
+    if (n!='') td.setAttribute('colname',n);
     if (c!='') td.className = c;
+    if (h===true) td.style.display = 'none';
     td.innerHTML = d;
     o.appendChild(td);
   };
@@ -69,13 +71,19 @@ THE SOFTWARE.
         var obj = thead[key];
         if (obj.hasOwnProperty('name')) {
           // column has been hidden (by default)
-          if (obj.hasOwnProperty('visible') && obj['visible']==='false') continue;
+          // if (obj.hasOwnProperty('visible') && obj['visible']==='false') continue;
+
+          // lets still create hidden rows, but choose to hide them from view
+          var h = false;
+          if (obj.hasOwnProperty('visible') && obj['visible']==='false') {
+            h = true;
+          }
           // add class to column
           var addClass = "";
           if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
           if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
           // create actual column
-          createColumnContent(row,json[i][obj['name']],addClass);
+          createColumnContent(row,json[i][obj['name']],addClass,obj['name'],h);
         }
       }
 
@@ -84,14 +92,6 @@ THE SOFTWARE.
     }
   };
 
-
-
-/*var thead = table.getElementsByTagName('TBODY')[0];
-        var trs = thead.getElementsByTagName('TR');
-        for (var i = 0; i < trs.length; i++) {
-          var cells = trs[i].cells[tbindex];
-          $(cells).attr('tbsorting','true');
-        }*/
 
   var TableQuery;
 
@@ -179,7 +179,7 @@ THE SOFTWARE.
       // if json exist, draw the table, or else wait..
       if (typeof settings.json !== 'undefined') {
         self.draw();
-        settings.success(settings.json);
+        settings.success(settings.json); 
 
         // this is one last update, incase success modifies the column headers
         if (settings.addons.fixedHeader===true) {
@@ -381,10 +381,12 @@ THE SOFTWARE.
     };
 
 
-    this.draw = function () {
+    this.draw = function (size) {
       if(settings.json.rows.length > 0){
-        createTableContent(this.selector,table,settings.columns,settings.json.rows);
-        
+        if (typeof size==='undefined') {
+          createTableContent(this.selector,table,settings.columns,settings.json.rows);
+        }
+
         // activate fixed header if option is true
         if (settings.addons.fixedHeader===true) {
           this.fixedHeader();
@@ -532,6 +534,7 @@ THE SOFTWARE.
           settings.columns[tbindex].visible = 'true';
 
           // remove the colvisible attr and show the column 
+          $(this.selector+' td[colname='+columns[i]+']').show();
           $(this.selector+' th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
           // do the same for the fixed header clone
           if (settings.addons.fixedHeader===true) {
@@ -540,7 +543,7 @@ THE SOFTWARE.
         }
 
         // redraw to fill in new columns
-        self.draw();
+        self.draw('true');
       }
     }
  
@@ -561,6 +564,7 @@ THE SOFTWARE.
           settings.columns[tbindex].visible = 'false';
 
           // add the colvisible attr and hide the column
+          $(this.selector+' td[colname='+columns[i]+']').hide();
           $(this.selector+' th[colname='+columns[i]+']').hide().attr('colvisible','false');
 
           // do the same for the fixed header 
@@ -570,7 +574,7 @@ THE SOFTWARE.
         }
 
         // redraw to fill in new columns
-        self.draw();
+        self.draw('true');
       }
     }
 
