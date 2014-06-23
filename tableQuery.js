@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.5
+@version: 1.0.6
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -416,11 +416,11 @@ THE SOFTWARE.
       var otable = document.getElementById(selector+'_FixedHeader_Cloned_id');
 
       // Set the wrapper width to match that of the cloned table 
-      $(this.selector+'_FixedHeader_Cloned_id').width($(table).width());
+      $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
       // keep up with all the column widths (TH)
       $("thead>tr th", table).each( function (i) {
-        $("thead>tr th:eq("+i+")", otable).width( $(this).width() );
+       // $("thead>tr th:eq("+i+")", otable).width( $(this).width() );
       });
 
 
@@ -456,12 +456,13 @@ THE SOFTWARE.
 
       $(window).scroll( function () {
         adjustFixedHeader();
-        $(self.selector+'_FixedHeader_Cloned_id').width($(table).width());
+        $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
+        console.log($('#'+selector).outerWidth());
       });
 
       $(window).resize( function () {
         adjustFixedHeader();
-        $(self.selector+'_FixedHeader_Cloned_id').width($(table).width());
+        $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
       });
 
       $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
