@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.8
+@version: 1.0.9
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -107,6 +107,7 @@ THE SOFTWARE.
     var table = document.getElementById(selector);
 
     var settings = {
+      request : 0,
       filter : {
         search : '',
         sort : {
@@ -115,12 +116,10 @@ THE SOFTWARE.
         }
       },
       addons : {
-        fixedHeader : false,
-        fixedFooter : false
+        fixedHeader : false
       },
       complete : {
-        fixedHeader : false,
-        fixedFooter : false
+        fixedHeader : false
       },
       beforeSend : function () { },
       success : function () { },
@@ -188,12 +187,6 @@ THE SOFTWARE.
             $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
           });
         }
-
-        if (settings.addons.fixedFooter===true) {
-          /*$("thead>tr th", document.getElementById(selector)).each( function (i) {
-            $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedFooter_Cloned_id')).width( $(this).width() );
-          });*/
-        }
       }
       else {
         // wait for request before continuing...
@@ -209,13 +202,6 @@ THE SOFTWARE.
                 $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
               });
             }
-
-            if (settings.addons.fixedFooter===true) {
-              /*$("thead>tr th", document.getElementById(selector)).each( function (i) {
-                $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedFooter_Cloned_id')).width( $(this).width() );
-              });*/
-            }
-
           }
         }, 10);
       }
@@ -237,10 +223,18 @@ THE SOFTWARE.
 
 
     this.ajaxRequest = function (aparam) {
+      // record how many requests
+      var requestn = settings.request;
+      // add each request 
+      settings.request++;
+
       $.ajax({
         "url" : settings.url,
         "data": settings.filter,
         "success": function (d) {
+          // only run the proper request, otherwise return nothing
+          if (requestn+1!=settings.request) return false;
+          // return the json for the table
           settings.json = d;
         },
         "beforeSend": function () {
@@ -393,11 +387,6 @@ THE SOFTWARE.
         if (settings.addons.fixedHeader===true) {
           this.fixedHeader();
         }
-
-        if (settings.addons.fixedFooter===true) {
-          // disable until bugs are resolved
-          this.fixedFooter();
-        }
       }
       else{
         $(this.selector).html('No records found!');
@@ -495,84 +484,6 @@ THE SOFTWARE.
 
       adjustFixedHeader();
     };
-
-
-    this.createFixedFooter = function() {
-      tableClone = table.cloneNode( false );
-      tableClone.removeAttribute( 'id' );
-
-      var hDiv = document.createElement( 'div' );
-      hDiv.style.position = "absolute";
-      // hDiv.style.top = "0px";
-      hDiv.style.left = "0px";
-      hDiv.style.bottom = "0px";
-      hDiv.className = "FixedFooter_Cloned";
-      hDiv.id = selector+"_FixedFooter_Cloned";
-      hDiv.style.zIndex = 9999;
-      // remove margins since we are going to poistion it absolute 
-      tableClone.style.margin = "0";
-
-      // Insert the newly cloned table into the DOM, on top of the "real" header 
-      hDiv.appendChild( tableClone );
-      document.body.appendChild( hDiv );
-
-      $(this.selector+"_FixedFooter_Cloned table").attr('id',selector+'_FixedFooter_Cloned_id');
-
-      var otable = document.getElementById(selector+'_FixedFooter_Cloned_id');
-
-      var nTfoot = $('tfoot', table).clone(true)[0];
-      otable.appendChild( nTfoot );
-
-      settings.complete.fixedFooter = true;
-    }
-
-   
-    this.fixedFooter = function() {
-      // only allow one header to be created
-      if (settings.complete.fixedFooter!==true) {
-        self.createFixedFooter();
-      }
-
-      // fixedFooter Div Table
-      var ftable = document.getElementById(selector+'_FixedFooter_Cloned');
-
-      // Set the wrapper width to match that of the cloned table 
-      $(this.selector+'_FixedFooter_Cloned_id').width($(table).width());
-
-      // keep up with all the column widths (TH)
-      $("tfoot>tr th", table).each( function (i) {
-        $("tfoot>tr th:eq("+i+")", ftable).width( $(this).width() );
-      });
-
-      function adjustFixedFooter()
-      {
-
-        var iTbodyHeight=0,anTbodies=table.getElementsByTagName('tbody');
-        for (var i = 0; i < anTbodies.length; ++i) {
-          iTbodyHeight += anTbodies[i].offsetHeight;
-        }
-
-      };
-
-      $(window).scroll( function () {
-        self.measureUp();
-        adjustFixedFooter();
-      });
-
-      $(window).resize( function () {
-        self.measureUp();
-        adjustFixedFooter();
-      });
-
-      $('#'+selector+'_FixedFooter_Cloned').css({'position':'fixed'});
-      $('#'+selector+'_FixedFooter_Cloned').css({'top':"auto"});
-      $('#'+selector+'_FixedFooter_Cloned').css({'bottom':"50px"});
-      $('#'+selector+'_FixedFooter_Cloned').css({'left':"199px"}); 
-
-      self.measureUp();
-      adjustFixedFooter();
-    };
-
 
     this.measureUp = function() {
 
