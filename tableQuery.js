@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.9
+@version: 1.0.10
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -281,6 +281,8 @@ THE SOFTWARE.
           // hide the column header
           if (cvisible==='false') {
             $(c).hide();
+            $(this.selector+' th[colname='+cname+']').hide();
+            $(this.selector+'_FixedHeader_Cloned_id th[colname='+cname+']').hide();
           }
 
           if (csort!=='false' && settings.already!='true' && i<1) {
