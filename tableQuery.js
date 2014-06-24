@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.14
+@version: 1.0.15
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -184,8 +184,8 @@ THE SOFTWARE.
 
         // this is one last update, incase success modifies the column headers
         if (settings.addons.fixedHeader===true) {
-          $("thead>tr th", document.getElementById(selector)).each( function (i) {
-            $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+          $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
+            $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
           });
         }
       }
@@ -199,8 +199,8 @@ THE SOFTWARE.
 
             // this is one last update, incase success modifies the column headers
             if (settings.addons.fixedHeader===true) {
-              $("thead>tr th", document.getElementById(selector)).each( function (i) {
-                $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+              $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
+                $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
               });
             }
           }
@@ -462,8 +462,8 @@ THE SOFTWARE.
       // Set the wrapper width to match that of the cloned table 
       $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
-      $("thead>tr th", document.getElementById(selector)).each( function (i) {
-        $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+      $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
+        $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
       });
 
       function adjustFixedHeader() {
@@ -494,11 +494,20 @@ THE SOFTWARE.
 
         $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
-        /* ~this is god awful slow */
+        // ~this WAS god awful slow
+        // only look at visble columns and change eq() to jquery not selector eq()
+        $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
+          $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
+        });
+
+        /*
+        - horrible...
         $("thead>tr th", document.getElementById(selector)).each( function (i) {
           $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
         });
 
+        */
+ 
       });
  
       $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
