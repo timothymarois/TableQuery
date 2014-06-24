@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.12
+@version: 1.0.13
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -115,6 +115,7 @@ THE SOFTWARE.
           dir:'asc'
         }
       },
+      saveSort : true,
       addons : {
         fixedHeader : false
       },
@@ -260,6 +261,13 @@ THE SOFTWARE.
 
 
     this.thead = function(t) {
+
+      settings.complete.sort = false;
+      if (settings.saveSort==true) {
+        var sd = localStorage.getItem(selector+'_tableQuery');
+        var ls = JSON.parse(sd);
+      }
+
       var thead = t.getElementsByTagName('THEAD')[0];
       var trs = thead.getElementsByTagName('TR');
       var heado = [];
@@ -288,11 +296,20 @@ THE SOFTWARE.
           if (csort!=='false' && settings.already!='true' && i<1) {
             $(c).attr('tbrole','columnsort');
 
-            if (cdefault==='true') {
+            // grab form local storage
+            if (settings.saveSort==true && ls) {
+              if (ls.col == cname) {
+                var cdefault = 'true';
+                var csort    = ls.dir;
+              }
+            }
+
+            if (cdefault==='true' && settings.complete.sort===false) {
+              settings.complete.sort = true;
               sorting = true;
               if (csort=='asc' || csort=='desc') {
                 $(c).attr('tbsort',csort);
-                if (csort=='ascending') {
+                if (csort=='asc') {
                   self.colsort(c,'asc');
                 }
                 else {
@@ -378,6 +395,14 @@ THE SOFTWARE.
       }
 
       $(th).attr('tbsort',sort).addClass(((sort=='desc') ? 'descending' : 'ascending' ));
+
+      // save sorting... when changed
+      if (settings.saveSort==true) {
+        s = {};
+        s.col = $(th).attr('colname');
+        s.dir = sort;
+        localStorage.setItem(selector+'_tableQuery', JSON.stringify(s));
+      }
     };
 
 
