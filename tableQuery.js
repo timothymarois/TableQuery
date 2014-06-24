@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.11
+@version: 1.0.12
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -435,9 +435,8 @@ THE SOFTWARE.
       }
 
       // Set the wrapper width to match that of the cloned table 
-      $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
+      $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
-      // keep up with all the column widths (TH)
       $("thead>tr th", document.getElementById(selector)).each( function (i) {
         $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
       });
@@ -471,21 +470,25 @@ THE SOFTWARE.
         }
       };
 
-
       $(window).scroll( function () {
         adjustFixedHeader();
-        $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
+        $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
       });
 
       $(window).resize( function () {
         adjustFixedHeader();
-        $(this.selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
-      });
+        // Set the wrapper width to match that of the cloned table 
+        $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
+        $("thead>tr th", document.getElementById(selector)).each( function (i) {
+          $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+        });
+
+      });
+ 
       $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
       $('#'+selector+'_FixedHeader_Cloned').css({'top':$(table).offset().top+"px"});
       $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
-
       adjustFixedHeader();
     };
 
@@ -598,11 +601,11 @@ THE SOFTWARE.
 
     // always measure up the document, window and table
     $(window).scroll( function () {
-      self.measureUp();
+      // self.measureUp();
     });
 
     $(window).resize( function () {
-      self.measureUp();
+      // self.measureUp();
     });
 
     // give outside access
