@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.13
+@version: 1.0.14
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -449,7 +449,7 @@ THE SOFTWARE.
       document.getElementById(selector+'_FixedHeader_Cloned_id').appendChild( nThead );
 
       settings.complete.fixedHeader = true;
-    }
+    };
 
 
     this.fixedHeader = function() {
@@ -466,29 +466,19 @@ THE SOFTWARE.
         $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
       });
 
-      function adjustFixedHeader()
-      {
+      function adjustFixedHeader() {
         self.measureUp();
-
-        var iTbodyHeight=0,anTbodies=table.getElementsByTagName('tbody');
-        for (var i = 0; i < anTbodies.length; ++i) {
-          iTbodyHeight += anTbodies[i].offsetHeight;
-        }
-
         if ( Measure.table.Top > Measure.win.ScrollTop ) {
-          // Above the table 
           $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
           $('#'+selector+'_FixedHeader_Cloned').css({'top':$(table).offset().top+"px"});
           $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
         }
-        else if ( Measure.win.ScrollTop > Measure.table.Top+iTbodyHeight ) {
-          // below the table 
+        else if ( Measure.win.ScrollTop > Measure.table.Top+Measure.table.cells ) {
           $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
-          $('#'+selector+'_FixedHeader_Cloned').css({'top':(Measure.table.Top+iTbodyHeight)+"px"});
+          $('#'+selector+'_FixedHeader_Cloned').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
           $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
         }
         else {
-          // In the middle of the table 
           $('#'+selector+'_FixedHeader_Cloned').css({'position':'fixed'});
           $('#'+selector+'_FixedHeader_Cloned').css({'top':"0px"});
           $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
@@ -497,14 +487,14 @@ THE SOFTWARE.
 
       $(window).scroll( function () {
         adjustFixedHeader();
-        $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
       });
 
       $(window).resize( function () {
         adjustFixedHeader();
-        // Set the wrapper width to match that of the cloned table 
+
         $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
 
+        /* ~this is god awful slow */
         $("thead>tr th", document.getElementById(selector)).each( function (i) {
           $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
         });
@@ -544,7 +534,6 @@ THE SOFTWARE.
 
     };
     
-
 
     /**
      * .show()
@@ -623,15 +612,6 @@ THE SOFTWARE.
    
     // begin table Initialization
     this.Initialize();
-
-    // always measure up the document, window and table
-    $(window).scroll( function () {
-      // self.measureUp();
-    });
-
-    $(window).resize( function () {
-      // self.measureUp();
-    });
 
     // give outside access
     return this;
