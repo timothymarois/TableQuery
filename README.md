@@ -9,6 +9,7 @@ This jQuery plug-in is built for AJAX (server-side) data loading.
 TableQuery does not do the actual sorting of columns. The server sends the proper order that will be displayed. 
 It is built for speed, and simplistic coding for efficiency.
 
+This is still underdevelopment, use at your own risk.
 
 JSON
 --
