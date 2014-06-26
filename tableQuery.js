@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.15
+@version: 1.0.16
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -173,6 +173,8 @@ THE SOFTWARE.
 
 
     this.request = function() {
+      // fadein loading div
+      $(".tableQuery_loading").fadeIn();
       // clear out all json until request fills up
       settings.json = undefined;
       // send the ajax request and fill up json
@@ -180,6 +182,10 @@ THE SOFTWARE.
       // if json exist, draw the table, or else wait..
       if (typeof settings.json !== 'undefined') {
         self.draw();
+        // fadeout Loading Div
+        $(".tableQuery_loading").fadeOut();
+
+        // send success function
         settings.success(settings.json); 
 
         // this is one last update, incase success modifies the column headers
@@ -195,7 +201,11 @@ THE SOFTWARE.
           if (typeof settings.json !== 'undefined') {
             clearInterval(rInt);
             self.draw();
-            settings.success(settings.json);
+            // fadeout Loading Div
+            $(".tableQuery_loading").fadeOut();
+
+            // send success function
+            settings.success(settings.json); 
 
             // this is one last update, incase success modifies the column headers
             if (settings.addons.fixedHeader===true) {
@@ -438,6 +448,12 @@ THE SOFTWARE.
       tableClone.style.margin = "0";
 
       // Insert the newly cloned table into the DOM, on top of the "real" header 
+      // only insert fixedHeader if it does not already exist
+      if ($('#'+selector+'_FixedHeader_Cloned').length > 0 ) {
+        settings.complete.fixedHeader = true;
+        return true;
+      }
+
       hDiv.appendChild( tableClone );
       document.body.appendChild( hDiv );
 
@@ -618,6 +634,9 @@ THE SOFTWARE.
     // create the wrapper div on our table
     // this includes our position: relative; (for fixed header)
     $(this.selector).wrap( "<div id='"+selector+"_wrapper' class='tableQuery_wrapper' style='position: relative;'></div>" );
+    $(this.selector).append( "<div id='"+selector+"_loading' class='tableQuery_loading' style='display:none'></div>" );
+
+
    
     // begin table Initialization
     this.Initialize();
