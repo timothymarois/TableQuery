@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.17
+@version: 1.0.18
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -545,7 +545,6 @@ THE SOFTWARE.
     };
 
     this.measureUp = function() {
-
       // doc and window measurements
       Measure.doc.Height = $(document).height();
       Measure.doc.Width = $(document).width();
@@ -555,7 +554,6 @@ THE SOFTWARE.
       Measure.win.ScrollLeft = $(window).scrollLeft();      
       Measure.win.ScrollRight = Measure.doc.Width - Measure.win.ScrollLeft - Measure.win.Width;
       Measure.win.ScrollBottom = Measure.doc.Height - Measure.win.ScrollTop - Measure.win.Height;
-
       // table measurements
       Measure.table.Width = $(this.selector).outerWidth()
       Measure.table.Height = $(this.selector).outerHeight();
@@ -564,15 +562,16 @@ THE SOFTWARE.
       Measure.table.Right = Measure.table.Left + Measure.table.Width;
       Measure.table.Right = Measure.doc.Width - Measure.table.Left - Measure.table.Width;
       Measure.table.Bottom = Measure.doc.Height - Measure.table.Top - Measure.table.Height;
-
       Measure.table.thead = $("thead", table).height(),
       Measure.table.tfoot = $("tfoot", table).height(),
       Measure.table.cells = $(table).height();
-
     };
     
 
+
     /**
+     * API - 
+     *
      * .show()
      * Show Columns
      *
@@ -603,6 +602,8 @@ THE SOFTWARE.
  
 
     /**
+     * API -
+     *
      * .hide()
      * Hide Columns
      *
@@ -634,6 +635,8 @@ THE SOFTWARE.
 
 
     /**
+     * API -
+     *
      * .reload()
      * Reload Table
      * - request a fresh table (server + draw)
@@ -645,9 +648,10 @@ THE SOFTWARE.
 
 
     /**
+     * API -  
+     *
      * .abort()
-     * Cancel a Ajax Server Request
-     * - cancels current XMLHttpRequest 
+     * Cancel a Ajax (XMLHttpRequest) Server Request
      *
      */
     this.abort = function() {
@@ -658,8 +662,6 @@ THE SOFTWARE.
     // this includes our position: relative; (for fixed header)
     $(this.selector).wrap( "<div id='"+selector+"_wrapper' class='tableQuery_wrapper' style='position: relative;'></div>" );
     $(this.selector).append( "<div id='"+selector+"_loading' class='tableQuery_loading' style='display:none'></div>" );
-
-
    
     // begin table Initialization
     this.Initialize();
