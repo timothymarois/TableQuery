@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.19
+@version: 1.0.20
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -273,6 +273,15 @@ THE SOFTWARE.
           }
           else if ( xhr.readyState === 4 ) {
             var error_message = 'Ajax Error';
+          }
+          else if ( error === 'abort' ) {
+            var error_message = 'Request was cancelled';
+          }
+          else if ( error === 'timeout' ) {
+            var error_message = 'Request Timedout';
+          }
+          else {
+            var error_message = 'Unknown Error';
           }
 
           console.log(selector+': '+error_message);
