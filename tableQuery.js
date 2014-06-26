@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.16
+@version: 1.0.17
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -108,6 +108,8 @@ THE SOFTWARE.
 
     var settings = {
       request : 0,
+      running : false,
+      ajax : {},
       filter : {
         search : '',
         sort : {
@@ -236,19 +238,28 @@ THE SOFTWARE.
     this.ajaxRequest = function (aparam) {
       // record how many requests
       var requestn = settings.request;
+
+      // if there is a current request running, 
+      // destroy it...
+      if (settings.running===true) {
+        self.abort();
+      }
+
       // add each request 
       settings.request++;
-
-      $.ajax({
+      settings.ajax = $.ajax({
         "url" : settings.url,
         "data": settings.filter,
         "success": function (d) {
           // only run the proper request, otherwise return nothing
           if (requestn+1!=settings.request) return false;
+          // complete request
+          settings.running = false;
           // return the json for the table
           settings.json = d;
         },
         "beforeSend": function () {
+          settings.running = true;
           settings.beforeSend();
         },
         "dataType": "json",
@@ -267,6 +278,7 @@ THE SOFTWARE.
           console.log(selector+': '+error_message);
         }
       });
+      
     };
 
 
@@ -629,6 +641,17 @@ THE SOFTWARE.
      */
     this.reload = function() {
       this.request();
+    }
+
+
+    /**
+     * .abort()
+     * Cancel a Ajax Server Request
+     * - cancels current XMLHttpRequest 
+     *
+     */
+    this.abort = function() {
+      settings.ajax.abort();
     }
 
     // create the wrapper div on our table
