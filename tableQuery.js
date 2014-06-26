@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.18
+@version: 1.0.19
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -193,7 +193,7 @@ THE SOFTWARE.
         // this is one last update, incase success modifies the column headers
         if (settings.addons.fixedHeader===true) {
           $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-            $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
+            $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
           });
         }
       }
@@ -212,7 +212,7 @@ THE SOFTWARE.
             // this is one last update, incase success modifies the column headers
             if (settings.addons.fixedHeader===true) {
               $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-                $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
+                $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
               });
             }
           }
@@ -312,7 +312,7 @@ THE SOFTWARE.
           if (cvisible==='false') {
             $(c).hide();
             $(this.selector+' th[colname='+cname+']').hide();
-            $(this.selector+'_FixedHeader_Cloned_id th[colname='+cname+']').hide();
+            $(this.selector+'_FixedHeader_Table th[colname='+cname+']').hide();
           }
 
           if (csort!=='false' && settings.already!='true' && i<1) {
@@ -413,7 +413,7 @@ THE SOFTWARE.
       
       // do the same for the fixed header
       if (settings.addons.fixedHeader===true) {
-        $(this.selector+'_FixedHeader_Cloned_id th[tbrole=columnsort]').removeClass('descending').removeClass('ascending').removeAttr( "tbsort" );
+        $(this.selector+'_FixedHeader_Table th[tbrole=columnsort]').removeClass('descending').removeClass('ascending').removeAttr( "tbsort" );
       }
 
       $(th).attr('tbsort',sort).addClass(((sort=='desc') ? 'descending' : 'ascending' ));
@@ -453,15 +453,15 @@ THE SOFTWARE.
       hDiv.style.position = "absolute";
       hDiv.style.top = "0px";
       hDiv.style.left = "0px";
-      hDiv.className = "FixedHeader_Cloned";
-      hDiv.id = selector+"_FixedHeader_Cloned";
+      hDiv.className = "FixedHeader_Wrapper";
+      hDiv.id = selector+"_FixedHeader_Wrapper";
       hDiv.style.zIndex = 99;
       // remove margins since we are going to poistion it absolute 
       tableClone.style.margin = "0";
 
       // Insert the newly cloned table into the DOM, on top of the "real" header 
       // only insert fixedHeader if it does not already exist
-      if ($('#'+selector+'_FixedHeader_Cloned').length > 0 ) {
+      if ($('#'+selector+'_FixedHeader_Wrapper').length > 0 ) {
         settings.complete.fixedHeader = true;
         return true;
       }
@@ -469,12 +469,12 @@ THE SOFTWARE.
       hDiv.appendChild( tableClone );
       document.body.appendChild( hDiv );
 
-      $(this.selector+"_FixedHeader_Cloned table").attr('id',selector+'_FixedHeader_Cloned_id');
-      $(this.selector+"_FixedHeader_Cloned").append("<div class='stole_shadow'></div>");
+      $(this.selector+"_FixedHeader_Wrapper table").attr('id',selector+'_FixedHeader_Table');
+      $(this.selector+"_FixedHeader_Wrapper").append("<div class='stole_shadow'></div>");
 
       /* Clone the DataTables header */
       var nThead = $('thead',table).clone(true)[0];
-      document.getElementById(selector+'_FixedHeader_Cloned_id').appendChild( nThead );
+      document.getElementById(selector+'_FixedHeader_Table').appendChild( nThead );
 
       settings.complete.fixedHeader = true;
     };
@@ -488,28 +488,28 @@ THE SOFTWARE.
       }
 
       // Set the wrapper width to match that of the cloned table 
-      $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
+      $('#'+selector+'_FixedHeader_Wrapper').width($('#'+selector).outerWidth());
 
       $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-        $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
+        $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
       });
 
       function adjustFixedHeader() {
         self.measureUp();
         if ( Measure.table.Top > Measure.win.ScrollTop ) {
-          $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
-          $('#'+selector+'_FixedHeader_Cloned').css({'top':$(table).offset().top+"px"});
-          $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
+          $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
         }
         else if ( Measure.win.ScrollTop > Measure.table.Top+Measure.table.cells ) {
-          $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
-          $('#'+selector+'_FixedHeader_Cloned').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
-          $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
+          $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
         }
         else {
-          $('#'+selector+'_FixedHeader_Cloned').css({'position':'fixed'});
-          $('#'+selector+'_FixedHeader_Cloned').css({'top':"0px"});
-          $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'position':'fixed'});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'top':"0px"});
+          $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
         }
       };
 
@@ -520,27 +520,27 @@ THE SOFTWARE.
       $(window).resize( function () {
         adjustFixedHeader();
 
-        $('#'+selector+'_FixedHeader_Cloned').width($('#'+selector).outerWidth());
+        $('#'+selector+'_FixedHeader_Wrapper').width($('#'+selector).outerWidth());
 
         // ~this WAS god awful slow
         // only look at visble columns and change eq() to jquery not selector eq()
         $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-          $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Cloned_id')).eq(i).width( $(this).width() );
+          $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
         });
 
         /*
         - horrible...
         $("thead>tr th", document.getElementById(selector)).each( function (i) {
-          $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Cloned_id')).width( $(this).width() );
+          $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Table')).width( $(this).width() );
         });
 
         */
  
       });
  
-      $('#'+selector+'_FixedHeader_Cloned').css({'position':'absolute'});
-      $('#'+selector+'_FixedHeader_Cloned').css({'top':$(table).offset().top+"px"});
-      $('#'+selector+'_FixedHeader_Cloned').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
+      $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
+      $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
+      $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
       adjustFixedHeader();
     };
 
@@ -591,7 +591,7 @@ THE SOFTWARE.
           $(this.selector+' th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
           // do the same for the fixed header clone
           if (settings.addons.fixedHeader===true) {
-            $(this.selector+'_FixedHeader_Cloned_id th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
+            $(this.selector+'_FixedHeader_Table th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
           }
         }
 
@@ -624,7 +624,7 @@ THE SOFTWARE.
 
           // do the same for the fixed header 
           if (settings.addons.fixedHeader===true) {
-            $(this.selector+'_FixedHeader_Cloned_id th[colname='+columns[i]+']').hide().attr('colvisible','false');
+            $(this.selector+'_FixedHeader_Table th[colname='+columns[i]+']').hide().attr('colvisible','false');
           }
         }
 
