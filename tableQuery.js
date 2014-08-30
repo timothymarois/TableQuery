@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.20
+@version: 1.0.22
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,7 +48,7 @@ THE SOFTWARE.
    * - create all the rows in the table
    *
    * @param : sel (table selector)
-   * @param : table (table selector)
+   * @param : table (table selector) 
    * @param : thead (header column properties)
    * @param : json (the table content)
    */
@@ -222,7 +222,11 @@ THE SOFTWARE.
 
 
     this.filter = function(filters) {
-      $.extend( settings.filter, filters );
+      if (filters!==null) {
+        $.extend( settings.filter, filters );
+      }
+      
+      return settings.filter;
     };
 
 
@@ -266,6 +270,9 @@ THE SOFTWARE.
         "cache": false,
         "type": ((typeof settings.type !== undefined) ? settings.type : 'GET'),
         "error": function (xhr, error, thrown) {
+          // remove loading if we fail from error
+          $(".tableQuery_loading").fadeOut();
+
           settings.error(xhr,error,thrown);
 
           if (error=='parsererror') {
@@ -370,49 +377,50 @@ THE SOFTWARE.
       }
 
       // append a click listener to the column header
-      $(this.selector+' th[tbrole=columnsort]').off().on('click',function(){
-        var sortby  = 'asc';
-        var tbsort  = $(this).attr('tbsort');
-        var colsort = $(this).attr('colsort');
-        var tbindex = $(this).attr('tbindex');
+      $(this.selector+' th[tbrole=columnsort]').off().on('click',function(e){
+        if (!$(e.target).is('.popover') && !$(e.target).is('.popover-content') && !$(e.target).is('.popover-content a')) {
 
-        if (tbsort=='desc') {
-          var sortby = 'asc';
-          self.colsort(this,sortby);
-        }
-        else if (tbsort=='asc') {
-          var sortby = 'desc';
-          self.colsort(this,sortby);
-        }
-        else {
-          if (colsort=='desc') {
-            var sortby = 'desc';
+          var sortby  = 'asc';
+          var tbsort  = $(this).attr('tbsort');
+          var colsort = $(this).attr('colsort');
+          var tbindex = $(this).attr('tbindex');
+
+          if (tbsort=='desc') {
+            var sortby = 'asc';
+            self.colsort(this,sortby);
           }
-
-          self.colsort(this,sortby);
-        }
-
-        // update the header array with correct sort
-        for (var j = 0; j < settings.columns.length; j++) { 
-          if (tbindex==j) {
-            settings.columns[j].sorting = true;
-            settings.columns[j].sort = sortby;
+          else if (tbsort=='asc') {
+            var sortby = 'desc';
+            self.colsort(this,sortby);
           }
           else {
-            settings.columns[j].sorting = false;
+            if (colsort=='desc') {
+              var sortby = 'desc';
+            }
+
+            self.colsort(this,sortby);
           }
+
+          // update the header array with correct sort
+          for (var j = 0; j < settings.columns.length; j++) { 
+            if (tbindex==j) {
+              settings.columns[j].sorting = true;
+              settings.columns[j].sort = sortby;
+            }
+            else {
+              settings.columns[j].sorting = false;
+            }
+          }
+
+          // add new sort options
+          settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
+          self.request();
         }
-
-        // add new sort options
-   
-
-        settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
-        self.request();
-
       });
 
       // almost a return, but this will suffice
       settings.columns = heado;
+
     };
 
 
@@ -449,7 +457,8 @@ THE SOFTWARE.
         }
       }
       else{
-        $(this.selector).html('No records found!');
+        createTableContent(this.selector,table,settings.columns,{});
+        // $(this.selector).html('No records found!');
       }      
     };
 
@@ -485,12 +494,26 @@ THE SOFTWARE.
       var nThead = $('thead',table).clone(true)[0];
       document.getElementById(selector+'_FixedHeader_Table').appendChild( nThead );
 
+      $(window).scroll( function () {
+        self.adjustFixedHeader();
+      });
+
+      $(window).resize( function () {
+        $('#'+selector+'_FixedHeader_Wrapper').width($('#'+selector).outerWidth());
+        self.adjustFixedHeader();
+
+        // only look at visble columns and change eq() to jquery not selector eq()
+        $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
+          $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
+        });
+      });
+
       settings.complete.fixedHeader = true;
     };
 
 
-    this.fixedHeader = function() {
 
+    this.fixedHeader = function() {
       // only allow one header to be created
       if (settings.complete.fixedHeader!==true) {
         self.createFixedHeader();
@@ -503,57 +526,35 @@ THE SOFTWARE.
         $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
       });
 
-      function adjustFixedHeader() {
-        self.measureUp();
-        if ( Measure.table.Top > Measure.win.ScrollTop ) {
-          $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
-          $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
-          $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
-        }
-        else if ( Measure.win.ScrollTop > Measure.table.Top+Measure.table.cells ) {
-          $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
-          $('#'+selector+'_FixedHeader_Wrapper').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
-          $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
-        }
-        else {
-          $('#'+selector+'_FixedHeader_Wrapper').css({'position':'fixed'});
-          $('#'+selector+'_FixedHeader_Wrapper').css({'top':"0px"});
-          $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
-        }
-      };
-
-      $(window).scroll( function () {
-        adjustFixedHeader();
-      });
-
-      $(window).resize( function () {
-        adjustFixedHeader();
-
-        $('#'+selector+'_FixedHeader_Wrapper').width($('#'+selector).outerWidth());
-
-        // ~this WAS god awful slow
-        // only look at visble columns and change eq() to jquery not selector eq()
-        $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-          $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
-        });
-
-        /*
-        - horrible...
-        $("thead>tr th", document.getElementById(selector)).each( function (i) {
-          $("thead>tr th:eq("+i+")", document.getElementById(selector+'_FixedHeader_Table')).width( $(this).width() );
-        });
-
-        */
- 
-      });
- 
       $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
       $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
       $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
-      adjustFixedHeader();
+      this.adjustFixedHeader();
     };
 
+
+    this.adjustFixedHeader = function() {
+      self.measureUp();
+      if ( Measure.table.Top > Measure.win.ScrollTop ) {
+        $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
+        $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
+        $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
+      }
+      else if ( Measure.win.ScrollTop > Measure.table.Top+Measure.table.cells ) {
+        $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
+        $('#'+selector+'_FixedHeader_Wrapper').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
+        $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
+      }
+      else {
+        $('#'+selector+'_FixedHeader_Wrapper').css({'position':'fixed'});
+        $('#'+selector+'_FixedHeader_Wrapper').css({'top':"0px"});
+        $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
+      }
+    };
+
+
     this.measureUp = function() {
+      // console.log(self.selector);
       // doc and window measurements
       Measure.doc.Height = $(document).height();
       Measure.doc.Width = $(document).width();
@@ -564,10 +565,10 @@ THE SOFTWARE.
       Measure.win.ScrollRight = Measure.doc.Width - Measure.win.ScrollLeft - Measure.win.Width;
       Measure.win.ScrollBottom = Measure.doc.Height - Measure.win.ScrollTop - Measure.win.Height;
       // table measurements
-      Measure.table.Width = $(this.selector).outerWidth()
-      Measure.table.Height = $(this.selector).outerHeight();
-      Measure.table.Left = $(this.selector).offset().left + table.parentNode.scrollLeft;
-      Measure.table.Top = $(this.selector).offset().top;
+      Measure.table.Width = $('.tableQuery_wrapper').outerWidth()
+      Measure.table.Height = $('.tableQuery_wrapper').outerHeight();
+      Measure.table.Left = $('.tableQuery_wrapper').offset().left + table.parentNode.scrollLeft;
+      Measure.table.Top = $('.tableQuery_wrapper').offset().top;
       Measure.table.Right = Measure.table.Left + Measure.table.Width;
       Measure.table.Right = Measure.doc.Width - Measure.table.Left - Measure.table.Width;
       Measure.table.Bottom = Measure.doc.Height - Measure.table.Top - Measure.table.Height;
