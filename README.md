@@ -106,6 +106,10 @@ TableQuery API
   // request a reload
   qtable.filter({test:123});
   
+  // filter "RETURN" is all filters, if you want to see what a filter is set to use
+  // just be sure to add the "param" blank object
+  qtable.filter({}).name_of_filter_value
+  
   // Show / Hide Columns
   // you can add as many columns as you wish within the array,
   // the names must match the column names .show() and .hide() 
