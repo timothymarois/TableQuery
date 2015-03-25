@@ -11,7 +11,7 @@ It is built for speed, and simplistic coding for efficiency.
 
 This is still underdevelopment, use at your own risk.
 
-JSON
+JSON (return)
 --
 TableQuery needs the server to respond with JSON request, format as follows.
 
@@ -25,8 +25,8 @@ followed by each Column name. (must match the column attributes, the order doesn
   "itemsFiltered":2,
   "itemsDisplayed":2,
   "rows":[
-    {"first_name":"John","last_name":"Smith","birth":"05-22-88"},
-    {"first_name":"Mike","last_name":"Bay","birth":"03-10-78"}, 
+    {"first_name":"John","last_name":"Smith","date":"05-22-88"},
+    {"first_name":"Mike","last_name":"Bay","date":"03-10-78"}, 
   ]
 }
 
@@ -39,7 +39,6 @@ HTML Table
 
 <!-- COLUMN HEADER ATTRIBUTES
      ============================
-
    "colname"    = name of the column (must match json array)
    "colclass"   = add a class to the "whole" column
    "colsort"    = sort this column by (ASC) or (DESC) [sets the default sortby] or (false) disable sorting
@@ -52,7 +51,7 @@ HTML Table
   <tr>
    <th colname="first_name" colsort="asc">First Name</th>
    <th colname="last_name" colsort="asc" coldefault="true">last Name</th>
-   <th colname="birth" colclass="aright" colvisible="false">Date of Birth</th>
+   <th colname="date" colclass="aright" colvisible="false">Date of Birth</th>
   </tr>
  </thead>
 </table>
@@ -64,9 +63,9 @@ Javascript
 
 ```javascript
 
-var qtable = $('#example').tableQuery({
+var tableQuery = $('#example').tableQuery({
   // file to request JSON data
-  url:'/myfile.php',
+  url:'/server-request.php',
   // POST (form) or GET (url param) request
   type:'POST',
   // everything sent in the filter, is sent to server as POST or GET filter[] array
@@ -74,10 +73,6 @@ var qtable = $('#example').tableQuery({
   filter:{
     limit:50,
     search:''
-  },
-  addons : {
-    // fixed header keeps the table <THEAD> always fixed and never scrolls off screen
-    fixedHeader: true
   },
   beforeSend: function() {
     // if you want to do anything before the server is complete
@@ -94,36 +89,42 @@ var qtable = $('#example').tableQuery({
   ```
   
   
-TableQuery API
+TableQuery Javascript API
 ---
 ```javascript
 
   // reloads the table (sends ajax request and updates the data)
-  qtable.reload();
+  tableQuery.reload();
+  
+  // abort current request. This allows you to cancel long requests, 
+  // and is used when reloading or requesting a new table
+  tableQuery.abort();
   
   // send filter changes using this function
   // it does not reload the table, so after you change all filters,
   // request a reload
-  qtable.filter({test:123});
+  tableQuery.filter({test:123});
   
-  // filter "RETURN" is all filters, if you want to see what a filter is set to use
-  // just be sure to add the "param" blank object
-  qtable.filter({}).name_of_filter_value
+  // returns all filters as an object
+  // when accessing all filters, be sure to send {} as the param since we are not "setting" a new filter.
+  tableQuery.filter({}).name_of_filter_value
+  
   
   // Show / Hide Columns
   // you can add as many columns as you wish within the array,
-  // the names must match the column names .show() and .hide() 
+  // the names must match the column names "colname"
   
-  // displays the column instantly
-  qtable.show(['birth']);
-  // hides the column instantly
-  qtable.hide(['last_name']);
+  // displays the column in view
+  tableQuery.show(['date']);
+  // hides the column in view
+  tableQuery.hide(['last_name']);
+  
   
   // if something isn't right, redraw the table. 
   // if changes in the html have changed from your own application,
   // you may need to tell tableQuery to draw up new columns
-  // this does not request server
-  qtable.draw();
+  // this does not request server, it only restructures the html.
+  tableQuery.draw();
 
 ```
 
