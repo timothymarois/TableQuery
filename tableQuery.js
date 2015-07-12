@@ -117,6 +117,7 @@ THE SOFTWARE.
       running : false,
       ajax : {},
       filter : {
+        limit : 50,
         search : '',
         sort : {
           col:'',
