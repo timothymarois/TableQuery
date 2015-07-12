@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.0.22
+@version: 1.1.0
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,15 +26,16 @@ THE SOFTWARE.
 
 (function($){
 
+
   /**
-   * createRowContent()
+   * createColumnContent()
    * - create columns (on rows)
    *
    * @param o : column in which the table is 
    * @param d : data of td column 
    * @param c : Class to add to each td column
    */
-  function createColumnContent(o,d,c,n,h) {
+  function _createColumns(o,d,c,n,h) {
     var td = document.createElement('td');
     if (n!='') td.setAttribute('colname',n);
     if (c!='') td.className = c;
@@ -43,8 +44,9 @@ THE SOFTWARE.
     o.appendChild(td);
   };
 
+
   /**
-   * createRows()
+   * createTableContent()
    * - create all the rows in the table
    *
    * @param : sel (table selector)
@@ -52,7 +54,7 @@ THE SOFTWARE.
    * @param : thead (header column properties)
    * @param : json (the table content)
    */
-  function createTableContent(sel,table,thead,json) {
+  function _createRows(sel,table,thead,json) {
     var rtbody = table.getElementsByTagName('TBODY')[0];
     // remove existing tbody
     if (rtbody) $(sel+" tbody").remove();
@@ -83,7 +85,7 @@ THE SOFTWARE.
           if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
           if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
           // create actual column
-          createColumnContent(row,json[i][obj['name']],addClass,obj['name'],h);
+          _createColumns(row,json[i][obj['name']],addClass,obj['name'],h);
         }
       }
 
@@ -95,8 +97,9 @@ THE SOFTWARE.
 
   var TableQuery;
 
+
   /**
-   * TableQuery main function
+   * TableQuery call function
    * $(selector).tableQuery();
    *
    * @param: options
@@ -107,6 +110,9 @@ THE SOFTWARE.
     var table = document.getElementById(selector);
 
     var settings = {
+      complete : {
+        sort:false
+      },
       request : 0,
       running : false,
       ajax : {},
@@ -117,51 +123,22 @@ THE SOFTWARE.
           dir:'asc'
         }
       },
+      debug : false,
+      inputSearch : '',
       saveSort : true,
-      addons : {
-        fixedHeader : false
-      },
-      complete : {
-        fixedHeader : false
-      },
       beforeSend : function () { },
       success : function () { },
       error : function () { }
     }
 
-    var Measure = {}
-    Measure.win = {
-      "scrollTop":0,
-      "ScrollRight":0,
-      "ScrollBottom":0,
-      "ScrollLeft":0,
-      "Height":0,
-      "Width":0
-    };
-
-    Measure.doc = {
-      "Height": 0,
-      "Width": 0
-    };
-
-    Measure.table = {
-      "Width": 0,
-      "Height": 0,
-      "Left": 0,
-      "Right": 0, 
-      "Top": 0,
-      "Bottom": 0,
-      "thead" : 0,
-      "tfoot" : 0,
-      "cells" : 0
-    };
-
-    Measure.offset = {
-      "top": 0
-    };
-
     var settings = $.extend({},settings,options);
 
+
+    /**
+     * Initialize
+     * Create Table 
+     * Send Server Request
+     */
     this.Initialize = function() {
       // add class to table
       $(this.selector).addClass('tableQuery');
@@ -171,53 +148,38 @@ THE SOFTWARE.
       settings.already = 'true';
       // send the ajax request
       this.request();
+      // filter helpers are static/built-in filters
+      this._privateInternalFilters();
     };
 
 
-    this.request = function() {
+    this.request = function(hide) {
       // fadein loading div
-      $(".tableQuery_loading").fadeIn();
+      if (typeof hide === 'undefined') {
+        $(".tableQuery_loading").fadeIn();
+      }
+
       // clear out all json until request fills up
       settings.json = undefined;
       // send the ajax request and fill up json
       this.ajaxRequest();
       // if json exist, draw the table, or else wait..
-      if (typeof settings.json !== 'undefined') {
-        self.draw();
-        // fadeout Loading Div
-        $(".tableQuery_loading").fadeOut();
+      // wait for request before continuing...
+      var rInt = setInterval(function(){
+        if (typeof settings.json !== 'undefined') {
+          clearInterval(rInt);
+          self.draw();
 
-        // send success function
-        settings.success(settings.json); 
-
-        // this is one last update, incase success modifies the column headers
-        if (settings.addons.fixedHeader===true) {
-          $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-            $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
-          });
-        }
-      }
-      else {
-        // wait for request before continuing...
-        var rInt = setInterval(function(){
-          if (typeof settings.json !== 'undefined') {
-            clearInterval(rInt);
-            self.draw();
-            // fadeout Loading Div
+          // fadeout Loading Div
+          if (typeof hide === 'undefined') {
             $(".tableQuery_loading").fadeOut();
-
-            // send success function
-            settings.success(settings.json); 
-
-            // this is one last update, incase success modifies the column headers
-            if (settings.addons.fixedHeader===true) {
-              $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-                $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
-              });
-            }
           }
-        }, 10);
-      }
+
+          // send success function
+          settings.success(settings.json); 
+        }
+      }, 10);
+      
     };
 
 
@@ -270,7 +232,7 @@ THE SOFTWARE.
         "cache": false,
         "type": ((typeof settings.type !== undefined) ? settings.type : 'GET'),
         "error": function (xhr, error, thrown) {
-          // remove loading if we fail from error
+
           $(".tableQuery_loading").fadeOut();
 
           settings.error(xhr,error,thrown);
@@ -291,7 +253,9 @@ THE SOFTWARE.
             var error_message = 'Unknown Error';
           }
 
-          console.log(selector+': '+error_message);
+          if (self.debug===true) {
+          	console.log(selector+': '+error_message);
+          }
         }
       });
       
@@ -299,7 +263,6 @@ THE SOFTWARE.
 
 
     this.thead = function(t) {
-
       settings.complete.sort = false;
       if (settings.saveSort==true) {
         var sd = localStorage.getItem(selector+'_tableQuery');
@@ -328,7 +291,6 @@ THE SOFTWARE.
           if (cvisible==='false') {
             $(c).hide();
             $(this.selector+' th[colname='+cname+']').hide();
-            $(this.selector+'_FixedHeader_Table th[colname='+cname+']').hide();
           }
 
           if (csort!=='false' && settings.already!='true' && i<1) {
@@ -339,6 +301,9 @@ THE SOFTWARE.
               if (ls.col == cname) {
                 var cdefault = 'true';
                 var csort    = ls.dir;
+              }
+              else {
+                var cdefault = 'false';
               }
             }
 
@@ -414,6 +379,11 @@ THE SOFTWARE.
 
           // add new sort options
           settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
+
+          if (settings.saveSort==true) {
+            localStorage.setItem(selector+'_tableQuery',JSON.stringify(settings.filter.sort));
+          }
+
           self.request();
         }
       });
@@ -427,154 +397,56 @@ THE SOFTWARE.
     this.colsort = function(th,sort) {
       // remove these... but after you've got what we need above
       $(this.selector+' th[tbrole=columnsort]').removeClass('descending').removeClass('ascending').removeAttr( "tbsort" );
-      
-      // do the same for the fixed header
-      if (settings.addons.fixedHeader===true) {
-        $(this.selector+'_FixedHeader_Table th[tbrole=columnsort]').removeClass('descending').removeClass('ascending').removeAttr( "tbsort" );
-      }
-
       $(th).attr('tbsort',sort).addClass(((sort=='desc') ? 'descending' : 'ascending' ));
-
-      // save sorting... when changed
-      if (settings.saveSort==true) {
-        s = {};
-        s.col = $(th).attr('colname');
-        s.dir = sort;
-        localStorage.setItem(selector+'_tableQuery', JSON.stringify(s));
-      }
     };
 
 
-    this.draw = function (size) {
-      if(settings.json.rows.length > 0){
-        if (typeof size==='undefined') {
-          createTableContent(this.selector,table,settings.columns,settings.json.rows);
-        }
-
-        // activate fixed header if option is true
-        if (settings.addons.fixedHeader===true) {
-          this.fixedHeader();
+    this.draw = function (size,fn) {
+      if(typeof settings.json !== 'undefined' && settings.json.rows.length > 0){
+        if (typeof size==='undefined' || size==='') {
+          _createRows(this.selector,table,settings.columns,settings.json.rows);
         }
       }
       else{
-        createTableContent(this.selector,table,settings.columns,{});
-        // $(this.selector).html('No records found!');
-      }      
-    };
+        _createRows(this.selector,table,settings.columns,{});
+      } 
 
-
-    this.createFixedHeader = function() {
-      tableClone = table.cloneNode( false );
-      tableClone.removeAttribute( 'id' );
-
-      var hDiv = document.createElement( 'div' );
-      hDiv.style.position = "absolute";
-      hDiv.style.top = "0px";
-      hDiv.style.left = "0px";
-      hDiv.className = "FixedHeader_Wrapper";
-      hDiv.id = selector+"_FixedHeader_Wrapper";
-      hDiv.style.zIndex = 99;
-      // remove margins since we are going to poistion it absolute 
-      tableClone.style.margin = "0";
-
-      // Insert the newly cloned table into the DOM, on top of the "real" header 
-      // only insert fixedHeader if it does not already exist
-      if ($('#'+selector+'_FixedHeader_Wrapper').length > 0 ) {
-        settings.complete.fixedHeader = true;
-        return true;
-      }
-
-      hDiv.appendChild( tableClone );
-      document.body.appendChild( hDiv );
-
-      $(this.selector+"_FixedHeader_Wrapper table").attr('id',selector+'_FixedHeader_Table');
-      $(this.selector+"_FixedHeader_Wrapper").append("<div class='stole_shadow'></div>");
-
-      /* Clone the DataTables header */
-      var nThead = $('thead',table).clone(true)[0];
-      document.getElementById(selector+'_FixedHeader_Table').appendChild( nThead );
-
-      $(window).scroll( function () {
-        self.adjustFixedHeader();
-      });
-
-      $(window).resize( function () {
-        $('#'+selector+'_FixedHeader_Wrapper').width($('#'+selector).outerWidth());
-        self.adjustFixedHeader();
-
-        // only look at visble columns and change eq() to jquery not selector eq()
-        $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-          $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
-        });
-      });
-
-      settings.complete.fixedHeader = true;
+      if (typeof fn === 'function') {
+        fn();
+      }     
     };
 
 
 
-    this.fixedHeader = function() {
-      // only allow one header to be created
-      if (settings.complete.fixedHeader!==true) {
-        self.createFixedHeader();
+    /**
+     * PRIVATE
+     *
+     * _privateInternalFilters()
+     * Attach to Built-In Filter Options
+     *
+     */
+    this._privateInternalFilters = function() {
+      // automatically attach to search box
+      if($(".tableQuery-search").length > 0) {
+        $('.tableQuery-search').on('keypress',function(e) {
+          if ( e.which == 13 ) {
+            self.filter({'search':$(this).val()});
+            self.reload();
+          }
+        });  
       }
 
-      // Set the wrapper width to match that of the cloned table 
-      $('#'+selector+'_FixedHeader_Wrapper').width($('#'+selector).outerWidth());
-
-      $("thead>tr th:visible", document.getElementById(selector)).each( function (i) {
-        $("thead>tr th:visible", document.getElementById(selector+'_FixedHeader_Table')).eq(i).width( $(this).width() );
-      });
-
-      $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
-      $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
-      $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
-      this.adjustFixedHeader();
-    };
-
-
-    this.adjustFixedHeader = function() {
-      self.measureUp();
-      if ( Measure.table.Top > Measure.win.ScrollTop ) {
-        $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
-        $('#'+selector+'_FixedHeader_Wrapper').css({'top':$(table).offset().top+"px"});
-        $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});         
+      // built-in reload button (also search button)
+      if($(".tableQuery-reload").length > 0) {
+        $('.tableQuery-reload').on('click',function(e) {
+          // built-in search filter (check if there is any content here)
+          if($(".tableQuery-search").length > 0) {
+            self.filter({'search':$(".tableQuery-search").val()});
+          }
+          self.reload();
+        });  
       }
-      else if ( Measure.win.ScrollTop > Measure.table.Top+Measure.table.cells ) {
-        $('#'+selector+'_FixedHeader_Wrapper').css({'position':'absolute'});
-        $('#'+selector+'_FixedHeader_Wrapper').css({'top':(Measure.table.Top+Measure.table.cells)+"px"});
-        $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});     
-      }
-      else {
-        $('#'+selector+'_FixedHeader_Wrapper').css({'position':'fixed'});
-        $('#'+selector+'_FixedHeader_Wrapper').css({'top':"0px"});
-        $('#'+selector+'_FixedHeader_Wrapper').css({'left':(Measure.table.Left-Measure.win.ScrollLeft)+"px"});
-      }
-    };
 
-
-    this.measureUp = function() {
-      // console.log(self.selector);
-      // doc and window measurements
-      Measure.doc.Height = $(document).height();
-      Measure.doc.Width = $(document).width();
-      Measure.win.Height = $(window).height();
-      Measure.win.Width = $(window).width();      
-      Measure.win.ScrollTop = $(window).scrollTop();      
-      Measure.win.ScrollLeft = $(window).scrollLeft();      
-      Measure.win.ScrollRight = Measure.doc.Width - Measure.win.ScrollLeft - Measure.win.Width;
-      Measure.win.ScrollBottom = Measure.doc.Height - Measure.win.ScrollTop - Measure.win.Height;
-      // table measurements
-      Measure.table.Width = $('.tableQuery_wrapper').outerWidth()
-      Measure.table.Height = $('.tableQuery_wrapper').outerHeight();
-      Measure.table.Left = $('.tableQuery_wrapper').offset().left + table.parentNode.scrollLeft;
-      Measure.table.Top = $('.tableQuery_wrapper').offset().top;
-      Measure.table.Right = Measure.table.Left + Measure.table.Width;
-      Measure.table.Right = Measure.doc.Width - Measure.table.Left - Measure.table.Width;
-      Measure.table.Bottom = Measure.doc.Height - Measure.table.Top - Measure.table.Height;
-      Measure.table.thead = $("thead", table).height(),
-      Measure.table.tfoot = $("tfoot", table).height(),
-      Measure.table.cells = $(table).height();
     };
     
 
@@ -593,16 +465,13 @@ THE SOFTWARE.
 
           // current column index
           var tbindex = $(this.selector+' th[colname='+columns[i]+']').attr('tbindex');
+          if (typeof tbindex === 'undefined') continue;
           // update the columns array
           settings.columns[tbindex].visible = 'true';
 
           // remove the colvisible attr and show the column 
           $(this.selector+' td[colname='+columns[i]+']').show();
           $(this.selector+' th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
-          // do the same for the fixed header clone
-          if (settings.addons.fixedHeader===true) {
-            $(this.selector+'_FixedHeader_Table th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
-          }
         }
 
         // redraw to fill in new columns
@@ -610,6 +479,7 @@ THE SOFTWARE.
       }
     }
  
+
 
     /**
      * API -
@@ -625,17 +495,14 @@ THE SOFTWARE.
 
           // current column index
           var tbindex = $(this.selector+' th[colname='+columns[i]+']').attr('tbindex');
+          if (typeof tbindex === 'undefined') continue;
+
           // update the columns array
           settings.columns[tbindex].visible = 'false';
 
           // add the colvisible attr and hide the column
           $(this.selector+' td[colname='+columns[i]+']').hide();
           $(this.selector+' th[colname='+columns[i]+']').hide().attr('colvisible','false');
-
-          // do the same for the fixed header 
-          if (settings.addons.fixedHeader===true) {
-            $(this.selector+'_FixedHeader_Table th[colname='+columns[i]+']').hide().attr('colvisible','false');
-          }
         }
 
         // redraw to fill in new columns
@@ -644,39 +511,48 @@ THE SOFTWARE.
     }
 
 
+
+    /**
+     * API -
+     *
+     * .redraw()
+     * Redraw Table (only aesthetic changes)
+     *
+     */
+    this.redraw = function() {
+      this.draw('true');
+    }
+
+
+
     /**
      * API -
      *
      * .reload()
-     * Reload Table
-     * - request a fresh table (server + draw)
+     * Reload Table (requesting server)
      *
      */
-    this.reload = function() {
-      this.request();
+    this.reload = function(hide) {
+      this.request(hide);
     }
+
 
 
     /**
      * API -  
      *
      * .abort()
-     * Cancel a Ajax (XMLHttpRequest) Server Request
+     * Cancel an Ajax (XMLHttpRequest) Server Request
+     *
+     * Beneficial if you want to end a long server request or re-filter 
+     * and dont want to run multiple request to the server.
      *
      */
     this.abort = function() {
       settings.ajax.abort();
     }
 
-    // create the wrapper div on our table
-    // this includes our position: relative; (for fixed header)
-    $(this.selector).wrap( "<div id='"+selector+"_wrapper' class='tableQuery_wrapper' style='position: relative;'></div>" );
-    $(this.selector).append( "<div id='"+selector+"_loading' class='tableQuery_loading' style='display:none'></div>" );
-   
-    // begin table Initialization
     this.Initialize();
-
-    // give outside access
     return this;
   };
 
