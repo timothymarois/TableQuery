@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.0
+@version: 1.1.1
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,6 +45,26 @@ THE SOFTWARE.
   };
 
 
+
+  /**
+   * createColumnContent()
+   * - create columns (on rows)
+   *
+   * @param o : column in which the table is 
+   * @param d : data of td column 
+   * @param c : Class to add to each td column
+   */
+  function _createTableBody(sel,table) {
+    var rtbody = table.getElementsByTagName('TBODY')[0];
+    // remove existing tbody (for a clean build)
+    if (rtbody) $(sel+" tbody").remove();
+    // create the tbody
+    var tbody = document.createElement('tbody');
+    table.appendChild(tbody);
+  };
+
+
+
   /**
    * createTableContent()
    * - create all the rows in the table
@@ -55,20 +75,42 @@ THE SOFTWARE.
    * @param : json (the table content)
    */
   function _createRows(sel,table,thead,json) {
-    var rtbody = table.getElementsByTagName('TBODY')[0];
-    // remove existing tbody
-    if (rtbody) $(sel+" tbody").remove();
-    // (IE) doesnt have remove() ~so use jQuery for now
-    // if (rtbody) rtbody.remove();
+    // get the <tbody>
+    var tbody = table.getElementsByTagName('TBODY')[0];
 
-    // create the tbody
-    var tbody = document.createElement('tbody');
-    table.appendChild(tbody);
+    var row = document.createElement('tr');
+    row.style.class = 'ttotalrow';
+
+    for (var key in thead) {
+      var obj = thead[key];
+      if (obj.hasOwnProperty('name')) {
+          var h = false;
+          if (obj.hasOwnProperty('visible') && obj['visible']==='false') {
+            h = true;
+          }
+          var addClass = "";
+          if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
+          if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
+
+          var content = json.filteredTotal[obj['name']];
+          if (content===undefined) {
+            content = '';
+            if (obj.hasOwnProperty('default')) {
+              content = obj['default'];
+            }
+          }
+
+          _createColumns(row,content,addClass,obj['name'],h);
+        }
+      }
+
+    // append each row
+    tbody.appendChild(row);
+
 
     // create rows
-    for(i=0; i<json.length; i++){
+    for(i=0; i<json.rows.length; i++){
       var row = document.createElement('tr');
-
       for (var key in thead) {
         var obj = thead[key];
         if (obj.hasOwnProperty('name')) {
@@ -84,8 +126,15 @@ THE SOFTWARE.
           var addClass = "";
           if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
           if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
-          // create actual column
-          _createColumns(row,json[i][obj['name']],addClass,obj['name'],h);
+
+          var content = json.rows[i][obj['name']];
+          if (content===undefined) {
+            content = '';
+            if (obj.hasOwnProperty('default')) {
+              content = obj['default'];
+            }
+          }
+          _createColumns(row,content,addClass,obj['name'],h);
         }
       }
 
@@ -273,14 +322,24 @@ THE SOFTWARE.
       var thead = t.getElementsByTagName('THEAD')[0];
       var trs = thead.getElementsByTagName('TR');
       var heado = [];
+      var sortingcomplete = false;
       for (var i = 0; i < trs.length; i++) {
         var cells = trs[i].cells;
         for (var j = 0; j < cells.length; j++) {
           var c = cells[j];
-
+          
           var cname    = $(c).attr('colname');
-          var cdefault = $(c).attr('coldefault');
-          var csort    = $(c).attr('colsort');
+          var coldefault = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
+          var csort    = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'true';
+
+          if ($(c).attr('colsortdefault')===undefined && csort!=='false') {
+            sortingcomplete = true;
+            var sortdefault = 'true';
+          }
+          else {
+            var sortdefault = $(c).attr('colsortdefault');
+          }
+
           var cvisible = $(c).attr('colvisible');
           var tbindex  = j;
           var sorting  = false;
@@ -300,15 +359,15 @@ THE SOFTWARE.
             // grab form local storage
             if (settings.saveSort==true && ls) {
               if (ls.col == cname) {
-                var cdefault = 'true';
+                var sortdefault = 'true';
                 var csort    = ls.dir;
               }
               else {
-                var cdefault = 'false';
+                var sortdefault = 'false';
               }
             }
 
-            if (cdefault==='true' && settings.complete.sort===false) {
+            if (sortdefault==='true' && settings.complete.sort===false) {
               settings.complete.sort = true;
               sorting = true;
               if (csort=='asc' || csort=='desc') {
@@ -332,7 +391,8 @@ THE SOFTWARE.
             name:cname,
             sort:csort,
             index:tbindex,
-            default:cdefault,
+            sortdefault:sortdefault,
+            default:coldefault,
             visible:cvisible,
             sorting:sorting,
             class:$(c).attr('colclass')
@@ -402,13 +462,19 @@ THE SOFTWARE.
     };
 
 
+
+    
+
+
     this.draw = function (size,fn) {
       if(typeof settings.json !== 'undefined' && settings.json.rows.length > 0){
         if (typeof size==='undefined' || size==='') {
-          _createRows(this.selector,table,settings.columns,settings.json.rows);
+          _createTableBody(this.selector,table);
+          _createRows(this.selector,table,settings.columns,settings.json);
         }
       }
       else{
+        _createTableBody(this.selector,table);
         _createRows(this.selector,table,settings.columns,{});
       } 
 
