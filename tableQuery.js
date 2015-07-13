@@ -35,9 +35,9 @@ THE SOFTWARE.
    * @param d : data of td column 
    * @param c : Class to add to each td column
    */
-  function _createColumns(o,d,c,n,h) {
-    var td = document.createElement('td');
-    if (n!='') td.setAttribute('colname',n);
+  function _createColumns(o,d,c,n,h,ty) {
+    var td = document.createElement(ty);
+    if (n!='') td.setAttribute('colname',n); 
     if (c!='') td.className = c;
     if (h===true) td.style.display = 'none';
     td.innerHTML = d;
@@ -74,49 +74,52 @@ THE SOFTWARE.
    * @param : thead (header column properties)
    * @param : json (the table content)
    */
-  function _createRows(sel,table,thead,json) {
-    // get the <tbody>
-    var tbody = table.getElementsByTagName('TBODY')[0];
+  function _createRows(sel,table,thead,settings) {
 
-    var row = document.createElement('tr');
-    row.style.class = 'ttotalrow';
+    if (settings.json===undefined) return false;
 
-    for (var key in thead) {
-      var obj = thead[key];
-      if (obj.hasOwnProperty('name')) {
-          var h = false;
-          if (obj.hasOwnProperty('visible') && obj['visible']==='false') {
-            h = true;
-          }
-          var addClass = "";
-          if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
-          if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
+    var rtbody = table.getElementsByTagName('TBODY')[0];
+    var rthead = table.getElementsByTagName('THEAD')[0];
 
-          var content = json.filteredTotal[obj['name']];
-          if (content===undefined) {
-            content = '';
-            if (obj.hasOwnProperty('default')) {
-              content = obj['default'];
+    if (settings.json.filteredTotal!==undefined && Object.keys(settings.json.filteredTotal).length > 0) {
+      var hrow = document.createElement('tr');
+      hrow.className = 'thtotalrow';
+
+      for (var key in thead) {
+        var obj = thead[key];
+        if (obj.hasOwnProperty('name')) {
+            var h = false;
+            if (obj.hasOwnProperty('visible') && obj['visible']==='false') {
+              h = true;
             }
+            var addClass = "";
+            if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
+            if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
+            var content = settings.json.filteredTotal[obj['name']];
+            if (content===undefined) {
+              content = '';
+              if (obj.hasOwnProperty('default')) {
+                content = obj['default'];
+              }
+            }
+
+            _createColumns(hrow,content,addClass,obj['name'],h,'th');
           }
-
-          _createColumns(row,content,addClass,obj['name'],h);
         }
-      }
 
-    // append each row
-    tbody.appendChild(row);
+      // append each row
+      rthead.appendChild(hrow);
+    }
 
 
     // create rows
-    for(i=0; i<json.rows.length; i++){
+    for(i=0; i<settings.json.rows.length; i++){
       var row = document.createElement('tr');
       for (var key in thead) {
         var obj = thead[key];
         if (obj.hasOwnProperty('name')) {
           // column has been hidden (by default)
           // if (obj.hasOwnProperty('visible') && obj['visible']==='false') continue;
-
           // lets still create hidden rows, but choose to hide them from view
           var h = false;
           if (obj.hasOwnProperty('visible') && obj['visible']==='false') {
@@ -127,19 +130,19 @@ THE SOFTWARE.
           if (obj.hasOwnProperty('class') && obj['class']!==undefined) addClass += obj['class'];
           if (obj.hasOwnProperty('sorting') && obj['sorting']===true) addClass += ' sorting';
 
-          var content = json.rows[i][obj['name']];
+          var content = settings.json.rows[i][obj['name']];
           if (content===undefined) {
             content = '';
             if (obj.hasOwnProperty('default')) {
               content = obj['default'];
             }
           }
-          _createColumns(row,content,addClass,obj['name'],h);
+          _createColumns(row,content,addClass,obj['name'],h,'td');
         }
       }
 
       // append each row
-      tbody.appendChild(row);
+      rtbody.appendChild(row);
     }
   };
 
@@ -470,12 +473,12 @@ THE SOFTWARE.
       if(typeof settings.json !== 'undefined' && settings.json.rows.length > 0){
         if (typeof size==='undefined' || size==='') {
           _createTableBody(this.selector,table);
-          _createRows(this.selector,table,settings.columns,settings.json);
+          _createRows(this.selector,table,settings.columns,settings);
         }
       }
       else{
         _createTableBody(this.selector,table);
-        _createRows(this.selector,table,settings.columns,{});
+        _createRows(this.selector,table,settings.columns,settings);
       } 
 
       if (typeof fn === 'function') {
