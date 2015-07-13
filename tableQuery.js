@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.1
+@version: 1.1.3
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -55,6 +55,9 @@ THE SOFTWARE.
    * @param c : Class to add to each td column
    */
   function _createTableBody(sel,table) {
+    // remove the total bar if exists
+    if ($('.thtotalrow')) $(".thtotalrow").remove();
+    // find the table body
     var rtbody = table.getElementsByTagName('TBODY')[0];
     // remove existing tbody (for a clean build)
     if (rtbody) $(sel+" tbody").remove();
