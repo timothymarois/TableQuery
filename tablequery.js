@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.3
+@version: 1.1.4
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -334,16 +334,14 @@ THE SOFTWARE.
         for (var j = 0; j < cells.length; j++) {
           var c = cells[j];
           
-          var cname    = $(c).attr('colname');
-          var coldefault = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
-          var csort    = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'true';
+          var cname          = $(c).attr('colname');
+          var coldefault     = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
+          var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'true';
+          var sortdefault    = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
 
-          if ($(c).attr('colsortdefault')===undefined && csort!=='false') {
+          if ($(c).attr('colsortdefault')===undefined && csort!='false' && sortingcomplete===false) {
             sortingcomplete = true;
-            var sortdefault = 'true';
-          }
-          else {
-            var sortdefault = $(c).attr('colsortdefault');
+            sortdefault = 'true';
           }
 
           var cvisible = $(c).attr('colvisible');
@@ -365,19 +363,19 @@ THE SOFTWARE.
             // grab form local storage
             if (settings.saveSort==true && ls) {
               if (ls.col == cname) {
-                var sortdefault = 'true';
-                var csort    = ls.dir;
+                sortdefault = 'true';
+                csort    = ls.dir;
               }
               else {
-                var sortdefault = 'false';
-              }
+                sortdefault = 'false';
+              } 
             }
 
             if (sortdefault==='true' && settings.complete.sort===false) {
               settings.complete.sort = true;
               sorting = true;
               if (csort=='asc' || csort=='desc') {
-                $(c).attr('tbsort',csort);
+                $(c).attr('tbsort',csort); 
                 if (csort=='asc') {
                   self.colsort(c,'asc');
                 }
