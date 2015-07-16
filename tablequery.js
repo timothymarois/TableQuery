@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.4
+@version: 1.1.5
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -329,6 +329,18 @@ THE SOFTWARE.
       var trs = thead.getElementsByTagName('TR');
       var heado = [];
       var sortingcomplete = false;
+      var foundsortdefault = false;
+
+      for (var i = 0; i < trs.length; i++) {
+        var cells = trs[i].cells;
+        for (var j = 0; j < cells.length; j++) {
+          var c = cells[j];
+          if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false') {
+            foundsortdefault = true;
+          }
+        }
+      }
+
       for (var i = 0; i < trs.length; i++) {
         var cells = trs[i].cells;
         for (var j = 0; j < cells.length; j++) {
@@ -337,11 +349,13 @@ THE SOFTWARE.
           var cname          = $(c).attr('colname');
           var coldefault     = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
           var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'true';
-          var sortdefault    = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
 
-          if ($(c).attr('colsortdefault')===undefined && csort!='false' && sortingcomplete===false) {
+          if (foundsortdefault==false && csort!='false' && sortingcomplete===false) {
             sortingcomplete = true;
-            sortdefault = 'true';
+            var sortdefault = 'true';
+          }
+          else {
+            var sortdefault = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
           }
 
           var cvisible = $(c).attr('colvisible');
