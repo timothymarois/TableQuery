@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.5
+@version: 1.1.6
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,7 +56,7 @@ THE SOFTWARE.
    */
   function _createTableBody(sel,table) {
     // remove the total bar if exists
-    if ($('.thtotalrow')) $(".thtotalrow").remove();
+    if ($(sel+" .thtotalrow")) $(sel+" .thtotalrow").remove();
     // find the table body
     var rtbody = table.getElementsByTagName('TBODY')[0];
     // remove existing tbody (for a clean build)
