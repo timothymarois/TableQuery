@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.11
+@version: 1.1.12
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -681,7 +681,7 @@ THE SOFTWARE.
      * API -
      *
      * .debugColumns()
-     * Redraw Table (only aesthetic changes)
+     * return the settings columns (object of values)
      *
      */
     this.debugColumns = function() {
