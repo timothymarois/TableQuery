@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.6
+@version: 1.1.7
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -636,6 +636,10 @@ THE SOFTWARE.
     this.abort = function() {
       settings.ajax.abort();
     }
+
+
+    // create the wrapper div on our table
+    $(this.selector).wrap( "<div id='"+selector+"_wrapper' class='tableQuery_wrapper' style='position: relative;'></div>" );
 
     this.Initialize();
     return this;
