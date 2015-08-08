@@ -404,7 +404,6 @@ THE SOFTWARE.
 
 
             if (foundsortdefault===false && csort!='false' && backupsorting===false && cvisible!=='false') {
-              console.log('fuck you2');
               backupsorting = true;
               sortdefault = 'true';
             }
@@ -412,7 +411,6 @@ THE SOFTWARE.
             // grab form local storage
             if (settings.saveSort==true && ls && ls.sort && backupsorting===false) {
               if (ls.sort.col==cname && cvisible!=='false') {
-                console.log('fuck you');
                 sortdefault = 'true';
                 csort       = ls.sort.dir;
               }
