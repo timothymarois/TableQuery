@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.8
+@version: 1.1.9
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -335,7 +335,9 @@ THE SOFTWARE.
         var cells = trs[i].cells;
         for (var j = 0; j < cells.length; j++) {
           var c = cells[j];
-          if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false') {
+
+          var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
+          if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false' && cvisible!=='false') {
             foundsortdefault = true;
           }
         }
@@ -344,11 +346,17 @@ THE SOFTWARE.
       for (var i = 0; i < trs.length; i++) {
         var cells = trs[i].cells;
         for (var j = 0; j < cells.length; j++) {
-          var c = cells[j];
-          
+
+          var c              = cells[j];
+          var tbindex        = j;
+          var sorting        = false;
           var cname          = $(c).attr('colname');
           var coldefault     = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
           var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'true';
+          var cvisible       = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
+
+          // add the tbindex
+          $(c).attr('tbindex',tbindex);
 
           if (foundsortdefault==false && csort!='false' && sortingcomplete===false) {
             sortingcomplete = true;
@@ -357,13 +365,6 @@ THE SOFTWARE.
           else {
             var sortdefault = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
           }
-
-          var cvisible = $(c).attr('colvisible');
-          var tbindex  = j;
-          var sorting  = false;
-
-          // add the tbindex
-          $(c).attr('tbindex',tbindex);
 
           // hide the column header
           if (cvisible==='false') {
