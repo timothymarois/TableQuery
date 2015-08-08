@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.9
+@version: 1.1.10
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -321,7 +321,7 @@ THE SOFTWARE.
     this.thead = function(t) {
       settings.complete.sort = false;
       if (settings.saveSort==true) {
-        var sd = localStorage.getItem(selector+'_tableQuery');
+        var sd = localStorage.getItem(selector+'_tablequery');
         var ls = JSON.parse(sd);
       }
 
@@ -377,9 +377,9 @@ THE SOFTWARE.
 
             // grab form local storage
             if (settings.saveSort==true && ls) {
-              if (ls.col == cname) {
+              if (ls.sort.col == cname) {
                 sortdefault = 'true';
-                csort    = ls.dir;
+                csort    = ls.sort.dir;
               }
               else {
                 sortdefault = 'false';
@@ -461,7 +461,7 @@ THE SOFTWARE.
           settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
 
           if (settings.saveSort==true) {
-            localStorage.setItem(selector+'_tableQuery',JSON.stringify(settings.filter.sort));
+            localStorage.setItem(selector+'_tablequery',JSON.stringify({sort:settings.filter.sort}));
           }
 
           self.request();
