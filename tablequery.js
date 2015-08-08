@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.10
+@version: 1.1.11
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -328,20 +328,46 @@ THE SOFTWARE.
       var thead = t.getElementsByTagName('THEAD')[0];
       var trs = thead.getElementsByTagName('TR');
       var heado = [];
-      var sortingcomplete = false;
-      var foundsortdefault = false;
+      var backupsorting       = false;
+      var foundsortdefault    = false;
 
       for (var i = 0; i < trs.length; i++) {
         var cells = trs[i].cells;
         for (var j = 0; j < cells.length; j++) {
-          var c = cells[j];
-
+          var c        = cells[j];
+          var colname  = $(c).attr('colname');
           var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
-          if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false' && cvisible!=='false') {
-            foundsortdefault = true;
+          if (ls && ls.hide && ls.hide.indexOf(colname) > -1) {
+            cvisible = "false";
+          }
+
+          if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false') {            
+            if (cvisible!=='false') {
+              foundsortdefault = true;
+            }
           }
         }
       }
+
+
+      for (var i = 0; i < trs.length; i++) {
+        var cells = trs[i].cells;
+        for (var j = 0; j < cells.length; j++) {
+          var c        = cells[j];
+          var colname  = $(c).attr('colname');
+          var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
+
+          if (foundsortdefault===false && ls && ls.sort && ls.sort.col==colname) {
+            if (cvisible!=='false' && ls.hide.indexOf(colname) < 0) {     
+              foundsortdefault = true;
+            }
+            else {
+              foundsortdefault = false;
+            }
+          }
+        }
+      }
+
 
       for (var i = 0; i < trs.length; i++) {
         var cells = trs[i].cells;
@@ -352,18 +378,12 @@ THE SOFTWARE.
           var sorting        = false;
           var cname          = $(c).attr('colname');
           var coldefault     = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
-          var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'true';
+          var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'asc';
           var cvisible       = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
+          var sortdefault    = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
 
-          // add the tbindex
-          $(c).attr('tbindex',tbindex);
-
-          if (foundsortdefault==false && csort!='false' && sortingcomplete===false) {
-            sortingcomplete = true;
-            var sortdefault = 'true';
-          }
-          else {
-            var sortdefault = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
+          if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
+            cvisible = "false";
           }
 
           // hide the column header
@@ -372,20 +392,32 @@ THE SOFTWARE.
             $(this.selector+' th[colname='+cname+']').hide();
           }
 
-          if (csort!=='false' && settings.already!='true' && i<1) {
+          // add the tbindex
+          $(c).attr('tbindex',tbindex);
+          // allow sorting
+          if (csort!=='false') {
             $(c).attr('tbrole','columnsort');
+          }
 
-            // grab form local storage
-            if (settings.saveSort==true && ls) {
-              if (ls.sort.col == cname) {
-                sortdefault = 'true';
-                csort    = ls.sort.dir;
-              }
-              else {
-                sortdefault = 'false';
-              } 
+      
+          if (csort!=='false' && settings.already!='true' && i<1) {
+
+
+            if (foundsortdefault===false && csort!='false' && backupsorting===false && cvisible!=='false') {
+              console.log('fuck you2');
+              backupsorting = true;
+              sortdefault = 'true';
             }
 
+            // grab form local storage
+            if (settings.saveSort==true && ls && ls.sort && backupsorting===false) {
+              if (ls.sort.col==cname && cvisible!=='false') {
+                console.log('fuck you');
+                sortdefault = 'true';
+                csort       = ls.sort.dir;
+              }
+            }
+            
             if (sortdefault==='true' && settings.complete.sort===false) {
               settings.complete.sort = true;
               sorting = true;
@@ -461,6 +493,14 @@ THE SOFTWARE.
           settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
 
           if (settings.saveSort==true) {
+
+            if (ls && ls.hide!==null) {
+              var storage = {sort:settings.filter.sort,hide:ls.hide};
+            }
+            else {
+              var storage = {sort:settings.filter.sort};
+            }
+
             localStorage.setItem(selector+'_tablequery',JSON.stringify({sort:settings.filter.sort}));
           }
 
@@ -547,18 +587,40 @@ THE SOFTWARE.
      */
     this.show = function(columns) {
       if(columns.length > 0){
+
+        var cl = [];
         for (i = 0; i < columns.length; i++) { 
 
           // current column index
           var tbindex = $(this.selector+' th[colname='+columns[i]+']').attr('tbindex');
-          if (typeof tbindex === 'undefined') continue;
+          if (typeof tbindex === 'undefined' || typeof tbindex === undefined || typeof tbindex === null) continue;
+
           // update the columns array
           settings.columns[tbindex].visible = 'true';
 
           // remove the colvisible attr and show the column 
           $(this.selector+' td[colname='+columns[i]+']').show();
-          $(this.selector+' th[colname='+columns[i]+']').show().removeAttr( "colvisible" );
+          $(this.selector+' th[colname='+columns[i]+']').show().attr("colvisible","true");
         }
+
+
+        for (var j = 0; j < settings.columns.length; j++) { 
+          if (settings.columns[j].visible==="false") {
+            cl.push(settings.columns[j].name);
+          }
+        }
+
+        var sd = localStorage.getItem(selector+'_tablequery');
+        var ls = JSON.parse(sd);
+
+        if (ls && ls.sort!==null) {
+          var storage = {sort:ls.sort,hide:cl};
+        }
+        else {
+          var storage = {hide:cl};
+        }
+
+        localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
 
         // redraw to fill in new columns
         self.draw('true');
@@ -577,11 +639,13 @@ THE SOFTWARE.
      */
     this.hide = function(columns) {
       if(columns.length > 0){
+
+        var cl = [];
         for (i = 0; i < columns.length; i++) { 
 
           // current column index
           var tbindex = $(this.selector+' th[colname='+columns[i]+']').attr('tbindex');
-          if (typeof tbindex === 'undefined') continue;
+          if (typeof tbindex === 'undefined' || typeof tbindex === undefined || typeof tbindex === null) continue;
 
           // update the columns array
           settings.columns[tbindex].visible = 'false';
@@ -591,9 +655,39 @@ THE SOFTWARE.
           $(this.selector+' th[colname='+columns[i]+']').hide().attr('colvisible','false');
         }
 
+        for (var j = 0; j < settings.columns.length; j++) { 
+          if (settings.columns[j].visible==="false") {
+            cl.push(settings.columns[j].name);
+          }
+        }
+
+        var sd = localStorage.getItem(selector+'_tablequery');
+        var ls = JSON.parse(sd);
+
+        if (ls && ls.sort!==null) {
+          var storage = {sort:ls.sort,hide:cl};
+        }
+        else {
+          var storage = {hide:cl};
+        }
+
+        localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
+
         // redraw to fill in new columns
         self.draw('true');
       }
+    }
+
+
+    /**
+     * API -
+     *
+     * .debugColumns()
+     * Redraw Table (only aesthetic changes)
+     *
+     */
+    this.debugColumns = function() {
+      return settings.columns;
     }
 
 
@@ -637,6 +731,7 @@ THE SOFTWARE.
     this.abort = function() {
       settings.ajax.abort();
     }
+
 
     // create the wrapper div on our table
     $(this.selector).wrap( "<div id='"+selector+"_wrapper' class='tableQuery_wrapper' style='position: relative;'></div>" );
