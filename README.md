@@ -35,13 +35,14 @@ HTML Table
 
 ```html
 
-<!-- COLUMN HEADER ATTRIBUTES
+<!-- COLUMN HEADER ATTRIBUTES (all are optional except "colname")
      ============================
-   "colname"    = name of the column (must match json array)
-   "colclass"   = add a class to the "whole" column
-   "colsort"    = sort this column by (ASC) or (DESC) [sets the default sortby] or (false) disable sorting
-   "coldefault" = (true) sort this column by default on load
-   "colvisible" = (false) to hide column on load
+   "colname"        = name of the column (must match json array)
+   "colclass"       = default:empty add a CSS class to the whole column
+   "colsort"        = default:asc sort this column by (ASC) or (DESC) [sets the default sortby] or "false" to disable sorting
+   "colsortdefault" = default:false - sort this column by default on load (if no column specified, sort first available column.)
+   "coldefault"     = default:empty - value if missing from server return like "$0.00" 
+   "colvisible"     = default:true - false to hide column on load.
 -->
 
 <table id="example">
