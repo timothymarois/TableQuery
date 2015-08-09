@@ -1,15 +1,13 @@
 TableQuery
 ==========
 
-a jQuery plugin that communicates with the server and displays sortable table data.
-
+a jQuery plugin that communicates with the server and displays table content. 
+This provides the table frame work to sort and filter the data.
 
 Current Example of API features. I will complete this readme once I have some extra time. 
 This jQuery plug-in is built for AJAX (server-side) data loading. 
 TableQuery does not do the actual sorting of columns. The server sends the proper order that will be displayed. 
 It is built for speed, and simplistic coding for efficiency.
-
-This is still underdevelopment, use at your own risk.
 
 JSON (return)
 --
@@ -26,7 +24,7 @@ followed by each Column name. (must match the column attributes, the order doesn
   "itemsDisplayed":2,
   "rows":[
     {"first_name":"John","last_name":"Smith","date":"05-22-88"},
-    {"first_name":"Mike","last_name":"Bay","date":"03-10-78"}, 
+    {"first_name":"Mike","last_name":"Bay","date":"03-10-78"}
   ]
 }
 
@@ -50,7 +48,7 @@ HTML Table
  <thead>
   <tr>
    <th colname="first_name" colsort="asc">First Name</th>
-   <th colname="last_name" colsort="asc" coldefault="true">last Name</th>
+   <th colname="last_name" colsort="asc" colsortdefault="true">last Name</th>
    <th colname="date" colclass="aright" colvisible="false">Date of Birth</th>
   </tr>
  </thead>
@@ -124,7 +122,7 @@ TableQuery Javascript API
   // if changes in the html have changed from your own application,
   // you may need to tell tableQuery to draw up new columns
   // this does not request server, it only restructures the html.
-  tableQuery.draw();
+  tableQuery.redraw();
 
 ```
 
@@ -141,7 +139,7 @@ PHP Example (the POST variables)
   $sortby       = (isset($sort['dir']) && $sort['dir']!='') ? $sort['dir'] : 'asc';
 
   // how many results to display
-  $limit        = (isset($_POST['limit']) && $_POST['limit']!='') ? $_POST['limit'] : 10;
+  $limit        = (isset($_POST['limit']) && $_POST['limit']!='') ? $_POST['limit'] : 50;
   // custom search... and any other custom filters I want to send
   $search       = (isset($_POST['search']) && $_POST['search']!='') ? strtolower($_POST['search']) : '';
 
