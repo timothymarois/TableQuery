@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.12
+@version: 1.1.13
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -181,7 +181,7 @@ THE SOFTWARE.
       },
       debug : false,
       inputSearch : '',
-      saveSort : true,
+      save : true,
       beforeSend : function () { },
       success : function () { },
       error : function () { }
@@ -320,7 +320,7 @@ THE SOFTWARE.
 
     this.thead = function(t) {
       settings.complete.sort = false;
-      if (settings.saveSort==true) {
+      if (settings.save==true) {
         var sd = localStorage.getItem(selector+'_tablequery');
         var ls = JSON.parse(sd);
       }
@@ -409,7 +409,7 @@ THE SOFTWARE.
             }
 
             // grab form local storage
-            if (settings.saveSort==true && ls && ls.sort && backupsorting===false) {
+            if (settings.save==true && ls && ls.sort && backupsorting===false) {
               if (ls.sort.col==cname && cvisible!=='false') {
                 sortdefault = 'true';
                 csort       = ls.sort.dir;
@@ -490,7 +490,7 @@ THE SOFTWARE.
           // add new sort options
           settings.filter.sort = {col:$(this).attr('colname'),dir:sortby};
 
-          if (settings.saveSort==true) {
+          if (settings.save==true) {
 
             if (ls && ls.hide!==null) {
               var storage = {sort:settings.filter.sort,hide:ls.hide};
@@ -608,20 +608,22 @@ THE SOFTWARE.
           }
         }
 
-        var sd = localStorage.getItem(selector+'_tablequery');
-        var ls = JSON.parse(sd);
+        if (settings.save==true) {
+          var sd = localStorage.getItem(selector+'_tablequery');
+          var ls = JSON.parse(sd);
 
-        if (ls && ls.sort!==null) {
-          var storage = {sort:ls.sort,hide:cl};
+          if (ls && ls.sort!==null) {
+            var storage = {sort:ls.sort,hide:cl};
+          }
+          else {
+            var storage = {hide:cl};
+          }
+
+          localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
         }
-        else {
-          var storage = {hide:cl};
-        }
 
-        localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
-
-        // redraw to fill in new columns
         self.draw('true');
+
       }
     }
  
@@ -659,19 +661,20 @@ THE SOFTWARE.
           }
         }
 
-        var sd = localStorage.getItem(selector+'_tablequery');
-        var ls = JSON.parse(sd);
+        if (settings.save==true) {
+          var sd = localStorage.getItem(selector+'_tablequery');
+          var ls = JSON.parse(sd);
 
-        if (ls && ls.sort!==null) {
-          var storage = {sort:ls.sort,hide:cl};
+          if (ls && ls.sort!==null) {
+            var storage = {sort:ls.sort,hide:cl};
+          }
+          else {
+            var storage = {hide:cl};
+          }
+
+          localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
         }
-        else {
-          var storage = {hide:cl};
-        }
 
-        localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
-
-        // redraw to fill in new columns
         self.draw('true');
       }
     }
