@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.13
+@version: 1.1.14
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -499,7 +499,7 @@ THE SOFTWARE.
               var storage = {sort:settings.filter.sort};
             }
 
-            localStorage.setItem(selector+'_tablequery',JSON.stringify({sort:settings.filter.sort}));
+            localStorage.setItem(selector+'_tablequery',JSON.stringify(storage));
           }
 
           self.request();
