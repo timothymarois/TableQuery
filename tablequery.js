@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.14
+@version: 1.1.15
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -380,7 +380,6 @@ THE SOFTWARE.
           var coldefault     = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
           var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'asc';
           var cvisible       = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
-          var sortdefault    = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
 
           if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
             cvisible = "false";
@@ -405,7 +404,10 @@ THE SOFTWARE.
 
             if (foundsortdefault===false && csort!='false' && backupsorting===false && cvisible!=='false') {
               backupsorting = true;
-              sortdefault = 'true';
+              var sortdefault = 'true';
+            }
+            else {
+              var sortdefault = 'false';
             }
 
             // grab form local storage
@@ -413,6 +415,11 @@ THE SOFTWARE.
               if (ls.sort.col==cname && cvisible!=='false') {
                 sortdefault = 'true';
                 csort       = ls.sort.dir;
+              }
+            }
+            else {
+              if (foundsortdefault===true) {
+                sortdefault = ($(c).attr('colsortdefault')!==undefined) ? $(c).attr('colsortdefault') : 'false';
               }
             }
             
