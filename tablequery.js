@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.15
+@version: 1.1.16
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -337,8 +337,11 @@ THE SOFTWARE.
           var c        = cells[j];
           var colname  = $(c).attr('colname');
           var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
-          if (ls && ls.hide && ls.hide.indexOf(colname) > -1) {
+          if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
             cvisible = "false";
+          }
+          else {
+            cvisible = "true";
           }
 
           if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false') {            
@@ -356,6 +359,12 @@ THE SOFTWARE.
           var c        = cells[j];
           var colname  = $(c).attr('colname');
           var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
+          if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
+            cvisible = "false";
+          }
+          else {
+            cvisible = "true";
+          }
 
           if (foundsortdefault===false && ls && ls.sort && ls.sort.col==colname) {
             if (cvisible!=='false' && ls.hide.indexOf(colname) < 0) {     
@@ -383,6 +392,9 @@ THE SOFTWARE.
 
           if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
             cvisible = "false";
+          }
+          else {
+            cvisible = "true";
           }
 
           // hide the column header
