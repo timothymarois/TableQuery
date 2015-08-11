@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.16
+@version: 1.1.17
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -391,10 +391,10 @@ THE SOFTWARE.
           var cvisible       = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
 
           if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
-            cvisible = "false";
+            var cvisible = "false";
           }
           else {
-            cvisible = "true";
+            var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
           }
 
           // hide the column header
@@ -472,6 +472,7 @@ THE SOFTWARE.
 
       // append a click listener to the column header
       $(this.selector+' th[tbrole=columnsort]').off().on('click',function(e){
+        // if we have a "popover" (such as a bootstrap message about a column "help icon" perhaps?)
         if (!$(e.target).is('.popover') && !$(e.target).is('.popover-content') && !$(e.target).is('.popover-content a')) {
 
           var sortby  = 'asc';
