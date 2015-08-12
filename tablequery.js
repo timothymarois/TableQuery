@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.17
+@version: 1.1.18
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -336,12 +336,16 @@ THE SOFTWARE.
         for (var j = 0; j < cells.length; j++) {
           var c        = cells[j];
           var colname  = $(c).attr('colname');
-          var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
-          if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
-            cvisible = "false";
+          if (ls && ls.hide) {
+            if (ls.hide.indexOf(cname) > -1) {
+              var cvisible = "false";
+            }
+            else {
+              var cvisible = "true";
+            }
           }
           else {
-            cvisible = "true";
+            var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
           }
 
           if ($(c).attr('colsortdefault')!==undefined && $(c).attr('colsortdefault')!='false') {            
@@ -358,12 +362,16 @@ THE SOFTWARE.
         for (var j = 0; j < cells.length; j++) {
           var c        = cells[j];
           var colname  = $(c).attr('colname');
-          var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
-          if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
-            cvisible = "false";
+          if (ls && ls.hide) {
+            if (ls.hide.indexOf(cname) > -1) {
+              var cvisible = "false";
+            }
+            else {
+              var cvisible = "true";
+            }
           }
           else {
-            cvisible = "true";
+            var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
           }
 
           if (foundsortdefault===false && ls && ls.sort && ls.sort.col==colname) {
@@ -388,10 +396,14 @@ THE SOFTWARE.
           var cname          = $(c).attr('colname');
           var coldefault     = ($(c).attr('coldefault')!==undefined) ? $(c).attr('coldefault') : '';
           var csort          = ($(c).attr('colsort')!==undefined) ? $(c).attr('colsort') : 'asc';
-          var cvisible       = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
 
-          if (ls && ls.hide && ls.hide.indexOf(cname) > -1) {
-            var cvisible = "false";
+          if (ls && ls.hide) {
+            if (ls.hide.indexOf(cname) > -1) {
+              var cvisible = "false";
+            }
+            else {
+              var cvisible = "true";
+            }
           }
           else {
             var cvisible = ($(c).attr('colvisible')!==undefined) ? $(c).attr('colvisible') : 'true';
