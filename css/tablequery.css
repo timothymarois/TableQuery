@@ -29,7 +29,7 @@ table.tableQuery>thead>tr>th, table.tableQuery>tbody>tr>th, table.tableQuery>tfo
   font-size: 11;
 }
 
-table.tableQuery>thead>tr.theaders>th {
+table.tableQuery>thead>tr>th {
   height: 40px;
 }
 

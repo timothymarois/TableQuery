@@ -20,6 +20,11 @@ $total_items_displayed = 0;
 // filtered results should declare true, otherwise declare false
 $results_filtered = false;
 
+// optional. allows you to create a total bar
+/* $filtered_total            = array();
+$filtered_total['yearly']  = 0;
+$filtered_total['monthly'] = 0;
+$filtered_total['daily']   = 0; */
 
 // our data array (normally this will be given by a database)
 $data = array();
