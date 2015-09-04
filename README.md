@@ -49,8 +49,8 @@ HTML Table
  <thead>
   <tr>
    <th colname="first_name" colsort="asc">First Name</th>
-   <th colname="last_name" colsort="asc" colsortdefault="true">last Name</th>
-   <th colname="date" colclass="aright" colvisible="false">Date of Birth</th>
+   <th colname="last_name"  colsort="asc"     colsortdefault="true">last Name</th>
+   <th colname="date"       colclass="aright" colvisible="false">Date of Birth</th>
   </tr>
  </thead>
 </table>
