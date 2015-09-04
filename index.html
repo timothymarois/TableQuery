@@ -3,13 +3,43 @@
 <head>
   <meta charset="utf-8">
   <title>TableQuery - Examples</title>
-  <link rel="stylesheet" href="http://tablequery.com/a/js/tablequery/tablequery.css">
 
+  <!-- additional for demo style -->
+  <link rel="stylesheet" href="http://tablequery.com/a/js/tablequery/tablequery.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+  <!-- required (jQuery + TableQuery JS -->
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="./js/tablequery.js"></script>
+
+  <!-- bootstrap is only for the demo use -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
 
 <body>
+
+
+<div class="container">
+  <h2>TableQuery</h2>
+  <p>(rows extracted from server-side json return)</p>            
+ 
+  <table id="expense_table" class="table table-hover table-nomargin table-bordered table-condensed">
+    <thead>
+      <tr class="theaders">
+        <th colname="name"    colsort="asc"   style="text-align:left;vertical-align: middle;" >Expenses</th >
+        <th colname="daily"   colsort="desc"  colclass="tdright"  coldefault="$0.00" style="text-align:right;vertical-align: middle;padding-right:30px" >Daily</th>
+        <th colname="monthly" colsort="desc"  colclass="tdright"  coldefault="$0.00" colsortdefault="true" style="text-align:right;vertical-align: middle;padding-right:30px" >Monthly</th>
+        <th colname="yearly"  colsort="desc"  colclass="tdright"  coldefault="$0.00" style="text-align:right;vertical-align: middle;padding-right:30px" >Yearly</th>
+      </tr>
+    </thead>
+  </table>
+
+</div>
+
+
+<script>
+  $('#expense_table').tableQuery({url:'./server-side/simple.php'});
+</script>
 
 </body>
 </html>
