@@ -1,0 +1,109 @@
+table.tableQuery {
+  margin: 0 auto;
+  clear: both;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: #FFF;
+  border: 1px solid #DDD;
+}
+
+table.tableQuery>thead>tr>th, table.tableQuery>tbody>tr>th, table.tableQuery>tfoot>tr>th {
+  background-color: #EEE;
+  color: #333;
+  font-size: 12px;
+  line-height: 1.428571429;
+  padding: 3px 18px 3px 10px;
+  border-left: 0;
+  border-bottom: 1px solid #DDD;
+  border-right: 1px solid #DDD;
+  border-left: 1px solid #DDD;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+table.tableQuery>thead>tr>th, table.tableQuery>tbody>tr>th, table.tableQuery>tfoot>tr>th, table.tableQuery>thead>tr>td, table.tableQuery>tbody>tr>td, table.tableQuery>tfoot>tr>td {
+  padding: 5px;
+  line-height: 1.428571429;
+  vertical-align: middle;
+  font-size: 11;
+}
+
+table.tableQuery>thead>tr.theaders>th {
+  height: 40px;
+}
+
+table.tableQuery>thead:first-child>tr:first-child>th, table.tableQuery>thead:first-child>tr:first-child>td {
+  border-top: 1px solid #DDD;
+}
+
+.tableQuery th[tbrole="columnsort"]:hover {
+  text-decoration:underline;
+  cursor: pointer;
+}
+
+.tableQuery th[tbsort="asc"], .tableQuery th[tbsort="desc"] {
+  font-weight: bold;
+}
+
+table.tableQuery>thead>tr>th[tbrole="columnsort"] {
+  background: url('../images/column-sortable-dark.png') no-repeat center right 5px #F1F1F1;
+  padding-right: 15px;
+}
+
+table.tableQuery>thead>tr>th[tbsort="asc"] {
+  background: url('../images/column-asc-dark.png') no-repeat center right 5px,linear-gradient(to bottom, #FFF 0%,#F6F6F6 47%,#EDEDED 100%);
+  padding-right: 15px;
+}
+
+table.tableQuery>thead>tr>th[tbsort="desc"] {
+  background: url('../images/column-desc-dark.png') no-repeat center right 5px,linear-gradient(to bottom, #FFF 0%,#F6F6F6 47%,#EDEDED 100%);
+  padding-right: 15px;
+}
+
+table.tableQuery td.sorting {
+  background-color: #FAFAFA;
+}
+
+table.tableQuery .tableQuery_loading {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  margin-top: 41px;
+  z-index: 998;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #FFF;
+  opacity: 0.5;
+}
+
+table.tableQuery>thead>tr>td, table.tableQuery>tbody>tr>td, table.tableQuery>tfoot>tr>td {
+  border: 0;
+  border-top: 1px solid #E7E7E7;
+  border-left: 1px solid #E9E9E9;
+}
+
+table.tableQuery>thead>tr>th.tdright,table.tableQuery>tbody>tr>td.tdright {
+  text-align:right !important;
+}
+
+table.tableQuery>thead>tr>th.tdcenter,table.tableQuery>tbody>tr>td.tdcenter {
+  text-align:center !important;
+}
+
+table.tableQuery>thead>tr>td.max200, table.tableQuery>tbody>tr>td.max200, table.tableQuery>tfoot>tr>td.max200 {
+  max-width: 200px;
+}
+
+table.tableQuery>thead>tr>td.max320, table.tableQuery>tbody>tr>td.max320, table.tableQuery>tfoot>tr>td.max320 {
+  max-width: 320px;
+}
+
+table.tableQuery>thead>tr>td.max420, table.tableQuery>tbody>tr>td.max420, table.tableQuery>tfoot>tr>td.max420 {
+  max-width: 420px;
+}
