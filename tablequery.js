@@ -1,7 +1,7 @@
 /* 
 
 @project: tableQuery < tablequery.com >
-@version: 1.1.18.develop
+@version: 1.1.18
 @author: Timothy Marois < timothymarois.com >
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
